@@ -442,7 +442,7 @@ export default function APKBuilder() {
                           }`}
                         >
                           <Globe className="w-4 h-4" />
-                          Website (URL app opens on launch)
+                          Website URL
                         </Label>
                         <Input
                           id="url"
@@ -488,7 +488,7 @@ export default function APKBuilder() {
                           htmlFor="hostName"
                           className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}
                         >
-                          Domain (TLDs: .com .org .net)
+                          Domain (.com .org .net)
                         </Label>
                         <Input
                           id="hostName"
@@ -503,8 +503,8 @@ export default function APKBuilder() {
                           }
                           required
                         />
-                        <p className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                        new builds may take up to 5 mins
+                        <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
+                        slower connections builds may take 2-3 mins
                         </p>
                       </div>
 
