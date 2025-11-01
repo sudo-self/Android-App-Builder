@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Globe, Moon, Sun, Download, RefreshCw, Github, Copy, Key } from "lucide-react"
 
-// GitHub Actions Configuration
+
 const GITHUB_OWNER = 'sudo-self'
 const GITHUB_REPO = 'apk-builder-actions'
 const GITHUB_TOKEN = process.env.NEXT_PUBLIC_GITHUB_TOKEN
@@ -60,7 +60,7 @@ export default function APKBuilder() {
     return () => clearInterval(timer)
   }, [])
 
-  // Poll GitHub Actions status when build is in progress
+
   useEffect(() => {
     if (!isBuilding || !githubRunId) return
 
@@ -72,7 +72,7 @@ export default function APKBuilder() {
           clearInterval(pollInterval)
           setIsBuilding(false)
           setIsComplete(true)
-          setTerminalLogs(prev => [...prev, "✅ Build completed! APK is ready for download."])
+          setTerminalLogs(prev => [...prev, "Build completed! APK is ready for download."])
           
           if (result.artifactUrl) {
             setArtifactUrl(result.artifactUrl)
@@ -482,13 +482,13 @@ export default function APKBuilder() {
                         />
                       </div>
 
-                      {/* Host Name Input */}
+                    
                       <div className="space-y-2">
                         <Label
                           htmlFor="hostName"
                           className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}
                         >
-                          Domain (https://)
+                          Domain (TLDs: .com .org .net)
                         </Label>
                         <Input
                           id="hostName"
@@ -504,7 +504,7 @@ export default function APKBuilder() {
                           required
                         />
                         <p className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                         new app builds can take up to 5 mins
+                        new builds may take up to 5 mins
                         </p>
                       </div>
 
@@ -559,7 +559,7 @@ export default function APKBuilder() {
                         className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-6 rounded-xl text-base font-semibold shadow-lg mb-4 transition-all hover:shadow-xl"
                       >
                         <Download className="w-5 h-5 mr-2" />
-                        Download APK
+                        Download APP
                       </Button>
 
                       {githubRunId && (
