@@ -36,14 +36,18 @@ export default function APKBuilder() {
     if (url) {
       try {
         const urlObj = new URL(url)
-        setHostName(urlObj.hostname)
+        const extractedHost = urlObj.hostname
+        setHostName(extractedHost)
         if (!appName) {
-          const defaultName = urlObj.hostname.replace(/^www\./, '').split('.')[0]
+          const defaultName = extractedHost.replace(/^www\./, '').split('.')[0]
           setAppName(defaultName.charAt(0).toUpperCase() + defaultName.slice(1))
         }
       } catch (e) {
-        // Invalid URL, ignore
+        // Invalid URL, clear hostname if URL is invalid
+        setHostName("")
       }
+    } else {
+      setHostName("")
     }
   }, [url, appName])
 
@@ -232,6 +236,17 @@ export default function APKBuilder() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    console.log('=== FORM SUBMIT DEBUG ===')
+    console.log('Form values at submit:')
+    console.log('  url:', url)
+    console.log('  appName:', appName)
+    console.log('  hostName:', hostName)
+    console.log('  themeColor:', themeColor)
+    console.log('  themeColorDark:', themeColorDark)
+    console.log('  backgroundColor:', backgroundColor)
+    console.log('========================')
+    
     if (url && appName && hostName) {
       const isValidWebsite = await validateWebsite(url)
       if (!isValidWebsite) {
@@ -253,9 +268,15 @@ export default function APKBuilder() {
         const buildId = `build_${Date.now()}`
         setBuildId(buildId)
 
+        // Clean the hostname - remove protocol, www, and trailing slashes
+        const cleanHostName = url
+          .replace(/^https?:\/\//, '')  // Remove http:// or https://
+          .replace(/^www\./, '')         // Remove www.
+          .replace(/\/$/, '')            // Remove trailing slash
+        
         const buildData = {
           buildId,
-          hostName: url.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+          hostName: cleanHostName,
           launchUrl: '/',
           name: appName,
           launcherName: appName,
@@ -264,7 +285,22 @@ export default function APKBuilder() {
           backgroundColor: backgroundColor
         }
         
-        console.log('Build data being sent to GitHub:', JSON.stringify(buildData, null, 2))
+        console.log('=== BUILD DATA DEBUG ===')
+        console.log('URL input:', url)
+        console.log('Cleaned hostname:', cleanHostName)
+        console.log('App name:', appName)
+        console.log('Full build data:', JSON.stringify(buildData, null, 2))
+        console.log('=======================')
+        
+        setTerminalLogs(prev => [
+          ...prev, 
+          `Build Configuration:`,
+          `  URL: ${url}`,
+          `  Hostname: ${cleanHostName}`,
+          `  App Name: ${appName}`,
+          `  Build ID: ${buildId}`,
+          `Starting build process...`
+        ])
 
         setTerminalLogs(prev => [...prev, "Starting build process..."])
         
@@ -273,7 +309,7 @@ export default function APKBuilder() {
         if (runId) {
           console.log('GitHub Run ID received:', runId)
           setGithubRunId(runId.toString())
-          setTerminalLogs(prev => [...prev, `GitHub Actions run started: #${runId}`, "Monitoring build progress..."])
+          setTerminalLogs(prev => [...prev, `GitHub Actions run #${runId} started`, "Monitoring build progress..."])
         } else {
           throw new Error('Failed to get GitHub Actions run ID')
         }
@@ -511,7 +547,7 @@ export default function APKBuilder() {
                           htmlFor="hostName"
                           className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}
                         >
-                          Domain (.com .org .net)
+                          Domain (auto-filled, editable)
                         </Label>
                         <Input
                           id="hostName"
@@ -526,6 +562,9 @@ export default function APKBuilder() {
                           }
                           required
                         />
+                        <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
+                          This will be used as your app's domain
+                        </p>
                       </div>
 
                       <Button
