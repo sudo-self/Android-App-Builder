@@ -638,21 +638,23 @@ export default function APKBuilder() {
                 </div>
 
                 <div className={`h-8 flex items-center justify-center border-t ${
-                  isDarkMode 
-                    ? "bg-slate-900 border-slate-800" 
-                    : "bg-slate-100 border-slate-300"
-                } rounded-b-[2.5rem]`}>
-                  <div className="scale-75 transform origin-center">
-                    <GitHubButton 
-                      href="https://github.com/sudo-self/apk-builder-actions" 
-                      data-color-scheme="no-preference: light; light: light; dark: light;" 
-                      data-icon="octicon-star" 
-                      data-size="large" 
-                      aria-label="Star sudo-self/apk-builder-actions on GitHub"
-                    >
-                      Star
-                    </GitHubButton>
-                  </div>
+  isDarkMode 
+    ? "bg-slate-900 border-slate-800" 
+    : "bg-slate-100 border-slate-300"
+} rounded-b-[2.5rem]`}>
+  <a 
+    href="https://github.com/sudo-self/apk-builder-actions" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="hover:opacity-80 transition-opacity"
+  >
+    <img 
+      src="https://img.shields.io/badge/-sudo--self-lightgrey?style=plastic&logo=github" 
+      alt="sudo-self" 
+      className="h-4"
+    />
+  </a>
+</div>
                 </div>
               </>
             )}
