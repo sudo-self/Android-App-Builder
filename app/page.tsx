@@ -358,12 +358,12 @@ export default function APKBuilder() {
 
           {/* Phone Screen */}
           <div
-            className={`absolute inset-2 rounded-[2.6rem] overflow-hidden transition-colors ${
+            className={`absolute inset-[6px] rounded-[2.5rem] overflow-hidden transition-colors ${
               isDarkMode ? "bg-black" : "bg-gradient-to-b from-slate-50 to-slate-100"
             }`}
           >     
             {showBootScreen ? (
-              <div className="h-full bg-black flex flex-col items-center justify-center">
+              <div className="h-full bg-black flex flex-col items-center justify-center rounded-[2.5rem]">
                 <div className="animate-in fade-in zoom-in duration-1000">
                   <svg className="w-32 h-32 text-[#3DDC84] mb-8" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.5 11.5 0 0 0-8.94 0L5.65 5.67c-.19-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C4.8 11.16 3.5 13.84 3.5 16.5V19h17v-2.5c0-2.66-1.3-5.34-2.9-7.02zM7 17.25c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75z" />
@@ -380,7 +380,7 @@ export default function APKBuilder() {
               <>
                 {/* Status Bar */}
                 <div
-                  className={`h-12 flex items-center justify-between px-8 text-xs ${
+                  className={`h-12 flex items-center justify-between px-8 text-xs rounded-t-[2.5rem] ${
                     isDarkMode ? "bg-slate-950 text-white" : "bg-slate-900 text-white"
                   }`}
                 >
@@ -405,7 +405,7 @@ export default function APKBuilder() {
                 </div>
 
                 {/* App Content */}
-                <div className="h-[calc(100%-3rem)] overflow-y-auto p-6">
+                <div className="h-[calc(100%-3rem)] overflow-y-auto p-6 rounded-b-[2.5rem]">
                   {isBuilding ? (
                     <div className="h-full bg-black rounded-xl p-4 overflow-y-auto font-mono">
                       {/* Terminal Header */}
@@ -635,7 +635,7 @@ export default function APKBuilder() {
                                 <div>Password: <span className="font-bold">123321</span></div>
                               </div>
                               <p className={`text-xs mt-3 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                                You will need this key to publish changes to your app.
+                                You will need this key to publish or make changes to your app later
                               </p>
                             </div>
                           )}
