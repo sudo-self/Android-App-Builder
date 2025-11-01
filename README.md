@@ -1,30 +1,3 @@
-# App builder interface
+## <a href="https://apk.jessejesse.com">Build Your App</a><br>
+<img width="1512" height="854" alt="og-image" src="https://github.com/user-attachments/assets/8498dedf-fb79-468b-a552-85e68fd64ceb" />
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/sudoselfs-projects/v0-app-builder-interface)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/tg4rqYjP5Ql)
-
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/sudoselfs-projects/v0-app-builder-interface](https://vercel.com/sudoselfs-projects/v0-app-builder-interface)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/tg4rqYjP5Ql](https://v0.app/chat/tg4rqYjP5Ql)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
