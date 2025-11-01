@@ -28,13 +28,11 @@ export default function APKBuilder() {
   const [showAppKey, setShowAppKey] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  // Extract hostname from URL when URL changes
   useEffect(() => {
     if (url) {
       try {
         const urlObj = new URL(url)
         setHostName(urlObj.hostname)
-        // Set default app name from hostname if not already set
         if (!appName) {
           const defaultName = urlObj.hostname.replace(/^www\./, '').split('.')[0]
           setAppName(defaultName.charAt(0).toUpperCase() + defaultName.slice(1))
@@ -70,7 +68,7 @@ export default function APKBuilder() {
           clearInterval(pollInterval)
           setIsBuilding(false)
           setIsComplete(true)
-          setTerminalLogs(prev => [...prev, "Build completed! APK is ready for download."])
+          setTerminalLogs(prev => [...prev, "Build completed. APK is ready for download."])
           
           if (result.artifactUrl) {
             setArtifactUrl(result.artifactUrl)
@@ -78,7 +76,7 @@ export default function APKBuilder() {
         } else if (result.status === 'failed') {
           clearInterval(pollInterval)
           setIsBuilding(false)
-          setTerminalLogs(prev => [...prev, "❌ Build failed. Check GitHub Actions for details."])
+          setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details."])
         }
       } catch (error) {
         console.error('Error polling GitHub status:', error)
@@ -147,26 +145,6 @@ export default function APKBuilder() {
     }
   }
 
-  const simulateTerminalOutput = async () => {
-    const steps = [
-      "Starting APK build process...",
-      "Validating website configuration...",
-      "Setting up Android project structure...",
-      "Configuring Trusted Web Activity...",
-      "Building application manifest...",
-      "Compiling resources and assets...",
-      "Packaging APK file...",
-      "Signing application with release key...",
-      "Build process completed successfully!",
-      "Creating Download link..."
-    ]
-
-    for (const message of steps) {
-      setTerminalLogs(prev => [...prev, message])
-      await new Promise(resolve => setTimeout(resolve, 2000))
-    }
-  }
-
   const triggerGitHubAction = async (buildData: any) => {
     if (!GITHUB_TOKEN) {
       throw new Error('GitHub token not configured. Please set NEXT_PUBLIC_GITHUB_TOKEN.')
@@ -199,10 +177,8 @@ export default function APKBuilder() {
 
       console.log('GitHub Action triggered successfully')
 
-      // Wait a moment for the run to be created
       await new Promise(resolve => setTimeout(resolve, 2000))
 
-      // Get the workflow run ID
       const runsResponse = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=5`,
         {
@@ -218,7 +194,6 @@ export default function APKBuilder() {
         console.log('Found workflow runs:', runsData.workflow_runs?.length)
         
         if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
-          // Find the most recent run that matches our build ID
           const recentRun = runsData.workflow_runs[0]
           console.log('Most recent run:', recentRun.id, recentRun.status)
           return recentRun.id
@@ -248,9 +223,6 @@ export default function APKBuilder() {
         console.log('Starting build process...')
         console.log('Environment check - GitHub Token:', GITHUB_TOKEN ? 'Set' : 'Not set')
 
-        // Start terminal simulation
-        simulateTerminalOutput()
-
         const buildId = `build_${Date.now()}`
         setBuildId(buildId)
 
@@ -267,14 +239,14 @@ export default function APKBuilder() {
 
         console.log('Sending build data:', buildData)
 
-        // Trigger GitHub Actions workflow
+        setTerminalLogs(prev => [...prev, "Starting build process..."])
+        
         const runId = await triggerGitHubAction(buildData)
         
         if (runId) {
           console.log('GitHub Run ID received:', runId)
           setGithubRunId(runId.toString())
-          setTerminalLogs(prev => [...prev, `GitHub Actions run started: #${runId}`])
-          setTerminalLogs(prev => [...prev, `Monitoring build progress...`])
+          setTerminalLogs(prev => [...prev, `GitHub Actions run started: #${runId}`, "Monitoring build progress..."])
         } else {
           throw new Error('Failed to get GitHub Actions run ID')
         }
@@ -291,8 +263,7 @@ export default function APKBuilder() {
           errorMessage = 'GitHub token not configured. Check your environment variables.'
         }
         
-        setTerminalLogs(prev => [...prev, `❌ Build failed: ${errorMessage}`])
-        setTerminalLogs(prev => [...prev, "Please check the console for details"])
+        setTerminalLogs(prev => [...prev, `Build failed: ${errorMessage}`, "Please check the console for details"])
         setTimeout(() => {
           setIsBuilding(false)
         }, 3000)
@@ -353,10 +324,8 @@ export default function APKBuilder() {
     <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="relative mx-auto w-[340px] h-[680px] bg-black rounded-[3rem] shadow-2xl border-8 border-[#3DDC84] overflow-hidden">
-          {/* Phone Notch */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl z-10" />
 
-          {/* Phone Screen */}
           <div
             className={`absolute inset-[6px] rounded-[2.5rem] overflow-hidden transition-colors ${
               isDarkMode ? "bg-black" : "bg-gradient-to-b from-slate-50 to-slate-100"
@@ -378,7 +347,6 @@ export default function APKBuilder() {
               </div>
             ) : (
               <>
-                {/* Status Bar */}
                 <div
                   className={`h-12 flex items-center justify-between px-8 text-xs rounded-t-[2.5rem] ${
                     isDarkMode ? "bg-slate-950 text-white" : "bg-slate-900 text-white"
@@ -402,11 +370,9 @@ export default function APKBuilder() {
                   </div>
                 </div>
 
-                {/* App Content */}
                 <div className="h-[calc(100%-3rem-24px)] overflow-y-auto p-6">
                   {isBuilding ? (
                     <div className="h-full bg-black rounded-xl p-4 overflow-y-auto font-mono">
-                      {/* Terminal Header */}
                       <div className="flex items-center gap-2 mb-4 text-green-400 text-sm">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -414,7 +380,6 @@ export default function APKBuilder() {
                         <span className="ml-2">apk.jessejesse.com</span>
                       </div>
 
-                      {/* Terminal Logs */}
                       <div className="space-y-2">
                         {terminalLogs.map((log, index) => (
                           <div
@@ -443,7 +408,7 @@ export default function APKBuilder() {
                               rel="noopener noreferrer"
                               className="underline hover:no-underline hover:pink-500"
                             >
-                              ↗ source code on GitHub
+                              source code on GitHub
                             </a>
                           </div>
                         )}
@@ -463,7 +428,6 @@ export default function APKBuilder() {
                         </p>
                       </div>
 
-                      {/* URL Input */}
                       <div className="space-y-2">
                         <Label
                           htmlFor="url"
@@ -489,7 +453,6 @@ export default function APKBuilder() {
                         />
                       </div>
 
-                      {/* App Name Input */}
                       <div className="space-y-2">
                         <Label
                           htmlFor="appName"
@@ -537,7 +500,6 @@ export default function APKBuilder() {
                         </p>
                       </div>
 
-                      {/* Submit Button */}
                       <Button
                         type="submit"
                         className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-6 rounded-xl text-base font-semibold shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
@@ -556,14 +518,13 @@ export default function APKBuilder() {
                           </svg>
                         </div>
                         <h2 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Build Complete!
+                          Build Complete
                         </h2>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                           Your Android App is ready for download
                         </p>
                       </div>
 
-                      {/* App Info */}
                       <div className="flex flex-col items-center gap-3 mb-8">
                         <div
                           className={`w-20 h-20 rounded-2xl shadow-xl flex items-center justify-center overflow-hidden border-2 ${
@@ -625,7 +586,7 @@ export default function APKBuilder() {
                                   }`}
                                 >
                                   <Copy className="w-4 h-4 mr-1" />
-                                  {copied ? "Copied!" : "Copy"}
+                                  {copied ? "Copied" : "Copy"}
                                 </Button>
                               </div>
                               <div className={`font-mono text-sm space-y-1 ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>
