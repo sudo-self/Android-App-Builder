@@ -318,17 +318,17 @@ export default function APKBuilder() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Phone Frame */}
-        <div className="relative mx-auto w-[340px] h-[680px] bg-black rounded-[3rem] shadow-2xl border-8 border-[#3DDC84]">
-          {/* Phone Notch */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl z-10" />
 
-          {/* Phone Screen */}
-          <div
-            className={`absolute inset-2 rounded-[2.6rem] overflow-hidden transition-colors ${
-              isDarkMode ? "bg-black" : "bg-gradient-to-b from-slate-50 to-slate-100"
-            }`}
-          >
+      <div className="relative mx-auto w-[340px] h-[680px] bg-black rounded-[3rem] shadow-2xl border-8 border-[#3DDC84] overflow-hidden">
+  {/* Phone Notch */}
+  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl z-10" />
+
+  {/* Phone Screen */}
+  <div
+    className={`absolute inset-2 rounded-[2.6rem] overflow-hidden transition-colors ${
+      isDarkMode ? "bg-black" : "bg-gradient-to-b from-slate-50 to-slate-100"
+    }`}
+  >
             {showBootScreen ? (
               <div className="h-full bg-black flex flex-col items-center justify-center">
                 <div className="animate-in fade-in zoom-in duration-1000">
