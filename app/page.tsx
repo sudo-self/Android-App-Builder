@@ -515,7 +515,7 @@ export default function APKBuilder() {
                           required
                         />
                         <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                        slower connections builds may take 2-3 mins
+                        lower quality connections may take 2-3 mins
                         </p>
                       </div>
 
