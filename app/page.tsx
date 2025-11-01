@@ -635,7 +635,7 @@ export default function APKBuilder() {
                                 <div>Password: <span className="font-bold">123321</span></div>
                               </div>
                               <p className={`text-xs mt-3 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                                You will need this key to publish or make changes to your app later
+                                You will need this key to publish changes to your app.
                               </p>
                             </div>
                           )}
@@ -665,5 +665,4 @@ export default function APKBuilder() {
     </div>
   )
 }
-
 
