@@ -328,8 +328,8 @@ export default function APKBuilder() {
     className={`absolute inset-2 rounded-[2.6rem] overflow-hidden transition-colors ${
       isDarkMode ? "bg-black" : "bg-gradient-to-b from-slate-50 to-slate-100"
     }`}
-  >
-            {showBootScreen ? (
+  >     
+    {showBootScreen ? (
               <div className="h-full bg-black flex flex-col items-center justify-center">
                 <div className="animate-in fade-in zoom-in duration-1000">
                   <svg className="w-32 h-32 text-[#3DDC84] mb-8" viewBox="0 0 24 24" fill="currentColor">
@@ -341,7 +341,7 @@ export default function APKBuilder() {
                   <div className="w-2 h-2 bg-[#3DDC84] rounded-full animate-bounce [animation-delay:-0.15s]" />
                   <div className="w-2 h-2 bg-[#3DDC84] rounded-full animate-bounce" />
                 </div>
-                <p className="text-[#3DDC84] text-sm font-medium animate-pulse">apk.JesseJesse.com</p>
+                <p className="text-[#3DDC84] text-sm font-medium animate-pulse">Android</p>
               </div>
             ) : (
               <>
@@ -634,3 +634,5 @@ export default function APKBuilder() {
     </div>
   )
 }
+
+
