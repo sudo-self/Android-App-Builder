@@ -37,7 +37,9 @@ export default function APKBuilder() {
     document.head.appendChild(script)
 
     return () => {
-      document.head.removeChild(script)
+      if (document.head.contains(script)) {
+        document.head.removeChild(script)
+      }
     }
   }, [])
 
@@ -409,7 +411,7 @@ export default function APKBuilder() {
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <span className="ml-2">apk.jessejesse.com</span>
+                        <span className="ml-2">JesseJesse.com</span>
                       </div>
 
                       <div className="space-y-2">
@@ -440,7 +442,7 @@ export default function APKBuilder() {
                               rel="noopener noreferrer"
                               className="underline hover:no-underline hover:pink-500"
                             >
-                              source code on GitHub
+                              view on GitHub
                             </a>
                           </div>
                         )}
@@ -453,7 +455,7 @@ export default function APKBuilder() {
                           <Github className="w-8 h-8 text-white" />
                         </div>
                         <h1 className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Android App Builder
+                          Android APK Builder
                         </h1>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                           build Android apps in seconds
@@ -495,7 +497,7 @@ export default function APKBuilder() {
                         <Input
                           id="appName"
                           type="text"
-                          placeholder="Enter app name"
+                          placeholder="enter app name"
                           value={appName}
                           onChange={(e) => setAppName(e.target.value)}
                           className={
@@ -512,7 +514,7 @@ export default function APKBuilder() {
                           htmlFor="hostName"
                           className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}
                         >
-                          Domain (.com .org .net)
+                          Domain Name (.com .org .net)
                         </Label>
                         <Input
                           id="hostName"
@@ -528,7 +530,7 @@ export default function APKBuilder() {
                           required
                         />
                         <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                        slower connections builds may take 2-3 mins
+                        low quality connections may take 2-5 mins
                         </p>
                       </div>
 
@@ -649,21 +651,24 @@ export default function APKBuilder() {
                   )}
                 </div>
 
-                <div className={`h-6 flex items-center justify-center border-t ${
+                <div className={`h-8 flex items-center justify-center border-t ${
                   isDarkMode 
-                    ? "bg-slate-900 border-slate-800 text-slate-400" 
-                    : "bg-slate-100 border-slate-300 text-slate-600"
+                    ? "bg-slate-900 border-slate-800" 
+                    : "bg-slate-100 border-slate-300"
                 } rounded-b-[2.5rem]`}>
-                  <a 
-                    className="github-button" 
-                    href="https://github.com/sudo-self/apk-builder-actions" 
-                    data-color-scheme="no-preference: light; light: light; dark: light;" 
-                    data-icon="octicon-star" 
-                    data-size="large" 
-                    aria-label="Star sudo-self/apk-builder-actions on GitHub"
-                  >
-                    Star
-                  </a>
+                  <div className="scale-75 transform origin-center">
+                    <a 
+                      className="github-button" 
+                      href="https://github.com/sudo-self/apk-builder-actions" 
+                      data-color-scheme="no-preference: light; light: light; dark: light;" 
+                      data-icon="octicon-star" 
+                      data-size="large" 
+                      data-show-count="false" 
+                      aria-label="Star sudo-self/apk-builder-actions on GitHub"
+                    >
+                      Star
+                    </a>
+                  </div>
                 </div>
               </>
             )}
@@ -673,4 +678,3 @@ export default function APKBuilder() {
     </div>
   )
 }
-
