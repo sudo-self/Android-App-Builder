@@ -49,7 +49,6 @@ export default function APKBuilder() {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Get GitHub token from environment
   const getGitHubToken = (): string | null => {
     if (typeof window === 'undefined') return null
     
@@ -102,7 +101,7 @@ export default function APKBuilder() {
     if (!isBuilding || !githubRunId) return
 
     let pollCount = 0
-    const maxPolls = 120 // 10 minutes max (5s intervals)
+    const maxPolls = 120
 
     const pollBuildStatus = async () => {
       if (pollCount >= maxPolls) {
@@ -128,16 +127,14 @@ export default function APKBuilder() {
           setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
           setIsBuilding(false)
         } else {
-          // Still building - add progress indicator
           const elapsedMinutes = Math.floor((Date.now() - buildStartTime) / 60000)
-          if (pollCount % 6 === 0) { // Every 30 seconds
+          if (pollCount % 6 === 0) {
             setTerminalLogs(prev => [...prev, `Still building... (${elapsedMinutes}m elapsed)`])
           }
           setTimeout(pollBuildStatus, 5000)
         }
       } catch (error) {
         console.error('Error polling GitHub status:', error)
-        // Continue polling on error
         setTimeout(pollBuildStatus, 5000)
       }
     }
@@ -232,7 +229,6 @@ export default function APKBuilder() {
 
       await new Promise(resolve => setTimeout(resolve, 5000))
 
-     
       const runsResponse = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=10`,
         {
@@ -246,7 +242,6 @@ export default function APKBuilder() {
       if (runsResponse.ok) {
         const runsData = await runsResponse.json()
         if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
-          
           const recentRun = runsData.workflow_runs[0]
           return recentRun.id.toString()
         }
@@ -305,13 +300,13 @@ export default function APKBuilder() {
         }
         
         setTerminalLogs([
-          "Starting APK build process...",
+          "initiated build workflow...",
           `App: ${appName}`,
           `Domain: ${cleanHostName}`,
           `Theme: ${themeColor}`,
           `Icon: ${iconChoice}`,
           `Build ID: ${buildId}`,
-          "Triggering GitHub Actions workflow...",
+          "app assembly in progress...",
           ""
         ])
 
@@ -321,10 +316,10 @@ export default function APKBuilder() {
           setGithubRunId(runId)
           setTerminalLogs(prev => [
             ...prev,
-            `GitHub Actions triggered successfully`,
+            `GitHub Actions started successfully`,
             `Run ID: ${runId}`,
-            "Monitoring build progress...",
-            "This may take 2-5 minutes...",
+            "build in progress...",
+            "may take 2-5 minutes...",
             ""
           ])
         } else {
@@ -396,6 +391,7 @@ export default function APKBuilder() {
   }
 
   const hasGitHubToken = !!getGitHubToken()
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center p-4">
