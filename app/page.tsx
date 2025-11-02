@@ -79,7 +79,338 @@ export default function APKBuilder() {
     return token || null
   }
 
-  // ... (keep all other useEffect hooks and functions the same)
+  // Define hasGitHubToken here, before the return statement
+  const hasGitHubToken = !!getGitHubToken()
+
+  useEffect(() => {
+    if (url) {
+      try {
+        const urlObj = new URL(url)
+        const extractedHost = urlObj.hostname
+        setHostName(extractedHost)
+        if (!appName) {
+          const defaultName = extractedHost.replace(/^www\./, '').split('.')[0]
+          setAppName(defaultName.charAt(0).toUpperCase() + defaultName.slice(1))
+        }
+        setError(null)
+      } catch (e) {
+        setHostName("")
+        if (url) {
+          setError("Please enter a valid URL with http:// or https://")
+        }
+      }
+    } else {
+      setHostName("")
+      setError(null)
+    }
+  }, [url, appName])
+
+  useEffect(() => {
+    const bootTimer = setTimeout(() => {
+      setShowBootScreen(false)
+    }, 3000)
+    return () => clearTimeout(bootTimer)
+  }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!isBuilding || !githubRunId) return
+
+    let pollCount = 0
+    const maxPolls = 120
+
+    const pollBuildStatus = async () => {
+      if (pollCount >= maxPolls) {
+        setTerminalLogs(prev => [...prev, "Build timeout - check GitHub Actions for status"])
+        setIsBuilding(false)
+        return
+      }
+
+      pollCount++
+
+      try {
+        const result = await checkBuildStatus(githubRunId)
+        
+        if (result.status === 'success') {
+          setTerminalLogs(prev => [...prev, "Build completed successfully", "APK is ready for download"])
+          setIsBuilding(false)
+          setIsComplete(true)
+          
+          if (result.artifactUrl) {
+            setArtifactUrl(result.artifactUrl)
+          }
+        } else if (result.status === 'failed') {
+          setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
+          setIsBuilding(false)
+        } else {
+          const elapsedMinutes = Math.floor((Date.now() - buildStartTime) / 60000)
+          if (pollCount % 6 === 0) {
+            setTerminalLogs(prev => [...prev, `Still building... (${elapsedMinutes}m elapsed)`])
+          }
+          setTimeout(pollBuildStatus, 5000)
+        }
+      } catch (error) {
+        console.error('Error polling GitHub status:', error)
+        setTimeout(pollBuildStatus, 5000)
+      }
+    }
+
+    pollBuildStatus()
+
+    return () => {
+      pollCount = maxPolls
+    }
+  }, [isBuilding, githubRunId, buildStartTime])
+
+  const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
+    const token = getGitHubToken()
+    if (!token) {
+      throw new Error('GitHub token not configured')
+    }
+    
+    try {
+      const runResponse = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}`,
+        {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        }
+      )
+      
+      if (!runResponse.ok) {
+        throw new Error(`GitHub API error: ${runResponse.status}`)
+      }
+      
+      const runData = await runResponse.json()
+      
+      if (runData.status === 'completed') {
+        if (runData.conclusion === 'success') {
+          return { status: 'success' }
+        } else {
+          return { status: 'failed' }
+        }
+      }
+      
+      return { status: 'pending' }
+    } catch (error) {
+      console.error('Error checking build status:', error)
+      throw error
+    }
+  }
+
+  const validateWebsite = async (url: string): Promise<boolean> => {
+    try {
+      const urlObj = new URL(url)
+      return !!(urlObj.hostname && urlObj.protocol.startsWith('http') && urlObj.hostname.includes('.'))
+    } catch (e) {
+      return false
+    }
+  }
+
+  const triggerGitHubAction = async (buildData: BuildData): Promise<string | null> => {
+    const token = getGitHubToken()
+    if (!token) {
+      throw new Error('GitHub token not configured. Please check your environment variables.')
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            event_type: 'apk_build',
+            client_payload: buildData
+          })
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        if (response.status === 404) {
+          throw new Error('GitHub repository not found or access denied')
+        } else if (response.status === 403) {
+          throw new Error('GitHub token invalid or missing permissions')
+        } else {
+          throw new Error(`GitHub API error: ${response.status} - ${response.statusText}`)
+        }
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 5000))
+
+      const runsResponse = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=10`,
+        {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        }
+      )
+
+      if (runsResponse.ok) {
+        const runsData = await runsResponse.json()
+        if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
+          const recentRun = runsData.workflow_runs[0]
+          return recentRun.id.toString()
+        }
+      }
+
+      return null
+
+    } catch (error) {
+      console.error('Error triggering GitHub action:', error)
+      throw error
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!getGitHubToken()) {
+      setError('GitHub token not configured. Please check your environment setup.')
+      return
+    }
+    
+    if (url && appName && hostName) {
+      const isValidWebsite = await validateWebsite(url)
+      if (!isValidWebsite) {
+        setError("Invalid website URL format. Please include http:// or https:// and a valid domain.")
+        return
+      }
+
+      setIsBuilding(true)
+      setError(null)
+      setTerminalLogs([])
+      setGithubRunId(null)
+      setArtifactUrl(null)
+      setBuildStartTime(Date.now())
+      setShowAppKey(false)
+
+      try {
+        const buildId = `build_${Date.now()}`
+        setBuildId(buildId)
+
+        const cleanHostName = url
+          .replace(/^https?:\/\//, '')
+          .replace(/^www\./, '')
+          .replace(/\/$/, '')
+        
+        const buildData: BuildData = {
+          buildId,
+          hostName: cleanHostName,
+          launchUrl: '/',
+          name: appName,
+          launcherName: appName,
+          themeColor: themeColor,
+          themeColorDark: themeColorDark,
+          backgroundColor: backgroundColor,
+          iconChoice: iconChoice
+        }
+        
+        setTerminalLogs([
+          "initiated build workflow...",
+          `App: ${appName}`,
+          `Domain: ${cleanHostName}`,
+          `Theme: ${themeColor}`,
+          `Icon: ${iconChoice}`,
+          `Build ID: ${buildId}`,
+          "app assembly in progress...",
+          ""
+        ])
+
+        const runId = await triggerGitHubAction(buildData)
+        
+        if (runId) {
+          setGithubRunId(runId)
+          setTerminalLogs(prev => [
+            ...prev,
+            `GitHub Actions started successfully`,
+            `Run ID: ${runId}`,
+            "build in progress...",
+            "may take 2-5 minutes...",
+            ""
+          ])
+        } else {
+          throw new Error('Failed to get GitHub Actions run ID. The build may have started - check GitHub Actions.')
+        }
+
+      } catch (error: any) {
+        console.error('Build error:', error)
+        const errorMessage = error.message || 'Unknown error occurred'
+        setTerminalLogs(prev => [...prev, `Build failed: ${errorMessage}`])
+        setError(errorMessage)
+        setIsBuilding(false)
+      }
+    }
+  }
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+  }
+
+  const downloadAPK = async () => {
+    if (githubRunId) {
+      window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+    }
+  }
+
+  const copyAppKey = async () => {
+    const keyInfo = `Alias: android\nPassword: 123321\n\nYou will need this key to publish changes to your app.`
+    
+    try {
+      await navigator.clipboard.writeText(keyInfo)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      const textArea = document.createElement('textarea')
+      textArea.value = keyInfo
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const resetForm = () => {
+    setIsComplete(false)
+    setIsBuilding(false)
+    setUrl("")
+    setAppName("")
+    setHostName("")
+    setThemeColor("#171717")
+    setThemeColorDark("#000000")
+    setBackgroundColor("#FFFFFF")
+    setIconChoice("phone")
+    setTerminalLogs([])
+    setBuildId(null)
+    setGithubRunId(null)
+    setArtifactUrl(null)
+    setBuildStartTime(0)
+    setShowAppKey(false)
+    setCopied(false)
+    setShowAdvanced(false)
+    setError(null)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center p-4">
