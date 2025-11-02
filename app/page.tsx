@@ -587,7 +587,7 @@ export default function APKBuilder() {
 
                       <div className="space-y-2">
                         <Label htmlFor="hostName" className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Domain (.com .net .info .org)
+                         TLDs .com .net. info .org
                         </Label>
                         <Input
                           id="hostName"
@@ -602,7 +602,7 @@ export default function APKBuilder() {
                           required
                         />
                         <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                         build powered by GitHub Actions & Next.js
+                         APK created with Gradle and GitHub Actions
                         </p>
                       </div>
 
