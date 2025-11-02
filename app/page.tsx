@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Globe, Moon, Sun, Download, RefreshCw, Github, Copy, Key, Palette, AlertCircle } from "lucide-react"
+import { Globe, Moon, Sun, Download, RefreshCw, Github, Copy, Key, Palette, AlertCircle, Image } from "lucide-react"
 
 const GITHUB_OWNER = 'sudo-self'
 const GITHUB_REPO = 'apk-builder-actions'
@@ -18,6 +18,7 @@ interface BuildData {
   themeColor: string
   themeColorDark: string
   backgroundColor: string
+  iconChoice: string
 }
 
 interface BuildStatus {
@@ -32,6 +33,7 @@ export default function APKBuilder() {
   const [themeColor, setThemeColor] = useState("#171717")
   const [themeColorDark, setThemeColorDark] = useState("#000000")
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF")
+  const [iconChoice, setIconChoice] = useState("default")
   const [isComplete, setIsComplete] = useState(false)
   const [isBuilding, setIsBuilding] = useState(false)
   const [terminalLogs, setTerminalLogs] = useState<string[]>([])
@@ -104,7 +106,7 @@ export default function APKBuilder() {
 
     const pollBuildStatus = async () => {
       if (pollCount >= maxPolls) {
-        setTerminalLogs(prev => [...prev, "⏰ Build timeout - check GitHub Actions for status"])
+        setTerminalLogs(prev => [...prev, "Build timeout - check GitHub Actions for status"])
         setIsBuilding(false)
         return
       }
@@ -115,7 +117,7 @@ export default function APKBuilder() {
         const result = await checkBuildStatus(githubRunId)
         
         if (result.status === 'success') {
-          setTerminalLogs(prev => [...prev, "✅ Build completed successfully!", "📱 APK is ready for download!"])
+          setTerminalLogs(prev => [...prev, "Build completed successfully", "APK is ready for download"])
           setIsBuilding(false)
           setIsComplete(true)
           
@@ -123,13 +125,13 @@ export default function APKBuilder() {
             setArtifactUrl(result.artifactUrl)
           }
         } else if (result.status === 'failed') {
-          setTerminalLogs(prev => [...prev, "❌ Build failed. Check GitHub Actions for details."])
+          setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
           setIsBuilding(false)
         } else {
           // Still building - add progress indicator
           const elapsedMinutes = Math.floor((Date.now() - buildStartTime) / 60000)
           if (pollCount % 6 === 0) { // Every 30 seconds
-            setTerminalLogs(prev => [...prev, `⏳ Still building... (${elapsedMinutes}m elapsed)`])
+            setTerminalLogs(prev => [...prev, `Still building... (${elapsedMinutes}m elapsed)`])
           }
           setTimeout(pollBuildStatus, 5000)
         }
@@ -299,16 +301,18 @@ export default function APKBuilder() {
           launcherName: appName,
           themeColor: themeColor,
           themeColorDark: themeColorDark,
-          backgroundColor: backgroundColor
+          backgroundColor: backgroundColor,
+          iconChoice: iconChoice
         }
         
         setTerminalLogs([
-          "🚀 Starting APK build process...",
-          `📱 App: ${appName}`,
-          `🌐 Domain: ${cleanHostName}`,
-          `🎨 Theme: ${themeColor}`,
-          `🆔 Build ID: ${buildId}`,
-          "⏳ Triggering GitHub Actions workflow...",
+          "Starting APK build process...",
+          `App: ${appName}`,
+          `Domain: ${cleanHostName}`,
+          `Theme: ${themeColor}`,
+          `Icon: ${iconChoice}`,
+          `Build ID: ${buildId}`,
+          "Triggering GitHub Actions workflow...",
           ""
         ])
 
@@ -318,10 +322,10 @@ export default function APKBuilder() {
           setGithubRunId(runId)
           setTerminalLogs(prev => [
             ...prev,
-            `✅ GitHub Actions triggered successfully!`,
-            `🔗 Run ID: ${runId}`,
-            "📡 Monitoring build progress...",
-            "⏰ This may take 2-5 minutes...",
+            `GitHub Actions triggered successfully`,
+            `Run ID: ${runId}`,
+            "Monitoring build progress...",
+            "This may take 2-5 minutes...",
             ""
           ])
         } else {
@@ -331,7 +335,7 @@ export default function APKBuilder() {
       } catch (error: any) {
         console.error('Build error:', error)
         const errorMessage = error.message || 'Unknown error occurred'
-        setTerminalLogs(prev => [...prev, `❌ Build failed: ${errorMessage}`])
+        setTerminalLogs(prev => [...prev, `Build failed: ${errorMessage}`])
         setError(errorMessage)
         setIsBuilding(false)
       }
@@ -380,6 +384,7 @@ export default function APKBuilder() {
     setThemeColor("#171717")
     setThemeColorDark("#000000")
     setBackgroundColor("#FFFFFF")
+    setIconChoice("default")
     setTerminalLogs([])
     setBuildId(null)
     setGithubRunId(null)
@@ -487,15 +492,27 @@ export default function APKBuilder() {
                           </div>
                         )}
 
+                        {isComplete && (
+                          <div className="mt-4 pt-4 border-t border-slate-700">
+                            <Button
+                              onClick={downloadAPK}
+                              className="w-full bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Download APK
+                            </Button>
+                          </div>
+                        )}
+
                         {githubRunId && (
                           <div className="text-gray-400 text-xs mt-4 pt-2 border-t border-slate-700">
                             <a 
                               href={`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="underline hover:no-underline hover:text-pink-500"
+                              className="underline hover:no-underline hover:text-blue-400"
                             >
-                              view live build on GitHub
+                              View live build on GitHub
                             </a>
                           </div>
                         )}
@@ -511,7 +528,7 @@ export default function APKBuilder() {
                           Android App Builder
                         </h1>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                          build Android apps in seconds
+                          Build Android apps in seconds
                         </p>
                       </div>
 
@@ -593,6 +610,32 @@ export default function APKBuilder() {
                           backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc'
                         }}>
                           <div className="space-y-2">
+                            <Label htmlFor="iconChoice" className={`font-medium flex items-center gap-2 ${
+                              isDarkMode ? "text-white" : "text-slate-900"
+                            }`}>
+                              <Image className="w-4 h-4" />
+                              App Icon
+                            </Label>
+                            <select
+                              id="iconChoice"
+                              value={iconChoice}
+                              onChange={(e) => setIconChoice(e.target.value)}
+                              className={`w-full p-2 rounded border ${
+                                isDarkMode
+                                  ? "bg-slate-800 border-slate-700 text-white"
+                                  : "bg-white border-slate-300 text-slate-900"
+                              }`}
+                            >
+                              <option value="default">Default Icon</option>
+                              <option value="alternative">Alternative Icon</option>
+                              <option value="modern">Modern Icon</option>
+                            </select>
+                            <p className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
+                              Choose the app icon style
+                            </p>
+                          </div>
+
+                          <div className="space-y-2">
                             <Label htmlFor="themeColor" className={`font-medium flex items-center gap-2 ${
                               isDarkMode ? "text-white" : "text-slate-900"
                             }`}>
@@ -673,7 +716,7 @@ export default function APKBuilder() {
                       )}
 
                       <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                        builds may take 2-5 minutes
+                        Builds may take 2-5 minutes
                       </p>
 
                       <Button
@@ -687,41 +730,40 @@ export default function APKBuilder() {
                     </form>
                   )}
                 </div>
-<div
-  className={`h-8 flex items-center justify-center gap-2 border-t ${
-    isDarkMode
-      ? "bg-slate-900 border-slate-800"
-      : "bg-slate-100 border-slate-300"
-  } rounded-b-[2.5rem]`}
->
-  <a
-    href="https://github.com/sudo-self/apk-builder-actions"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="hover:opacity-80 transition-opacity"
-  >
-    <img
-      src="https://img.shields.io/badge/-sudo--self-lightgrey?style=plastic&logo=github"
-      alt="sudo-self"
-      className="h-4"
-    />
-  </a>
 
+                <div
+                  className={`h-8 flex items-center justify-center gap-2 border-t ${
+                    isDarkMode
+                      ? "bg-slate-900 border-slate-800"
+                      : "bg-slate-100 border-slate-300"
+                  } rounded-b-[2.5rem]`}
+                >
+                  <a
+                    href="https://github.com/sudo-self/apk-builder-actions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    <img
+                      src="https://img.shields.io/badge/-sudo--self-lightgrey?style=plastic&logo=github"
+                      alt="sudo-self"
+                      className="h-4"
+                    />
+                  </a>
 
-  <a
-    href="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="hover:opacity-80 transition-opacity"
-  >
-    <img
-      src="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml/badge.svg"
-      alt="APK Builder Workflow Status"
-      className="h-4"
-    />
-  </a>
-</div>
-
+                  <a
+                    href="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    <img
+                      src="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml/badge.svg"
+                      alt="APK Builder Workflow Status"
+                      className="h-4"
+                    />
+                  </a>
+                </div>
               </>
             )}
           </div>
