@@ -79,7 +79,7 @@ export default function APKBuilder() {
     return token || null
   }
 
-  // Define hasGitHubToken here, before the return statement
+
   const hasGitHubToken = !!getGitHubToken()
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function APKBuilder() {
         const result = await checkBuildStatus(githubRunId)
         
         if (result.status === 'success') {
-          setTerminalLogs(prev => [...prev, "Build completed successfully", "APK is ready for download"])
+          setTerminalLogs(prev => [...prev, "Build completed", "APK is ready"])
           setIsBuilding(false)
           setIsComplete(true)
           
@@ -151,7 +151,7 @@ export default function APKBuilder() {
         } else {
           const elapsedMinutes = Math.floor((Date.now() - buildStartTime) / 60000)
           if (pollCount % 6 === 0) {
-            setTerminalLogs(prev => [...prev, `Still building... (${elapsedMinutes}m elapsed)`])
+            setTerminalLogs(prev => [...prev, `building... (${elapsedMinutes}m elapsed)`])
           }
           setTimeout(pollBuildStatus, 5000)
         }
