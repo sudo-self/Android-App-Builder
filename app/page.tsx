@@ -520,10 +520,10 @@ export default function APKBuilder() {
                           <Github className="w-8 h-8 text-white" />
                         </div>
                         <h1 className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Android App Builder
+                          apk.JesseJesse.com
                         </h1>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                          build your Android app in mins
+                          Github Actions APK Builder
                         </p>
                       </div>
 
