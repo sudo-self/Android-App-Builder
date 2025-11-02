@@ -632,30 +632,28 @@ export default function APKBuilder() {
                             </Label>
                             
                          
-                            <div className="grid grid-cols-3 gap-3">
-                              {ICON_CHOICES.map((icon) => (
-                                <div
-                                  key={icon.value}
-                                  className={`flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                                    iconChoice === icon.value
-                                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:text-white'
-                                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-slate-800'
-                                  }`}
-                                  onClick={() => setIconChoice(icon.value)}
-                                >
-                                  <img
-                                    src={icon.url}
-                                    alt={icon.label}
-                                    className="w-12 h-12 object-contain mb-2"
-                                  />
-                                  <span className={`text-xs text-center font-medium ${
-                                    isDarkMode ? "text-white" : "text-slate-900"
-                                  }`}>
-                                    {icon.label}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
+                           <div className="grid grid-cols-3 gap-3">
+  {ICON_CHOICES.map((icon) => (
+    <div
+      key={icon.value}
+      className={`flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
+        iconChoice === icon.value
+          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100'
+          : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white'
+      }`}
+      onClick={() => setIconChoice(icon.value)}
+    >
+      <img
+        src={icon.url}
+        alt={icon.label}
+        className="w-12 h-12 object-contain mb-2"
+      />
+      <span className="text-xs text-center font-medium">
+        {icon.label}
+      </span>
+    </div>
+  ))}
+</div>
 
                       
                             <select
