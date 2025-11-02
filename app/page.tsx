@@ -366,11 +366,11 @@ export default function APKBuilder() {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
   }
 
-  const downloadAPK = async () => {
-    if (githubRunId) {
-      window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
-    }
+ const downloadAPK = async () => {
+  if (githubRunId) {
+    window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
   }
+}
 
   const copyAppKey = async () => {
     const keyInfo = `Alias: android\nPassword: 123321\n\nYou will need this key to publish changes to your app.`
