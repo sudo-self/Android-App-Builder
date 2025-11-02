@@ -136,15 +136,16 @@ export default function APKBuilder() {
       try {
         const result = await checkBuildStatus(githubRunId)
         
-        if (result.status === 'success') {
-          setTerminalLogs(prev => [...prev, "Build completed", "APK is ready"])
-          setIsBuilding(false)
-          setIsComplete(true)
-          
-          if (result.artifactUrl) {
-            setArtifactUrl(result.artifactUrl)
-          }
-        } else if (result.status === 'failed') {
+     
+if (result.status === 'success') {
+  setTerminalLogs(prev => [...prev, "Build completed", "APK is ready"]);
+  setIsBuilding(false);
+  setIsComplete(true);
+  
+  if (result.artifactUrl) {
+    setArtifactUrl(result.artifactUrl);
+  }
+} else if (result.status === 'failed') {
           setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
           setIsBuilding(false)
         } else {
@@ -167,44 +168,67 @@ export default function APKBuilder() {
     }
   }, [isBuilding, githubRunId, buildStartTime])
 
-  const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
-    const token = getGitHubToken()
-    if (!token) {
-      throw new Error('GitHub token not configured')
+const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
+  const token = getGitHubToken();
+  if (!token) {
+    throw new Error('GitHub token not configured');
+  }
+  
+  try {
+    const runResponse = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}`,
+      {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      }
+    );
+    
+    if (!runResponse.ok) {
+      throw new Error(`GitHub API error: ${runResponse.status}`);
     }
     
-    try {
-      const runResponse = await fetch(
-        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}`,
-        {
-          headers: {
-            'Authorization': `token ${token}`,
-            'Accept': 'application/vnd.github.v3+json'
+    const runData = await runResponse.json();
+    
+    if (runData.status === 'completed') {
+      if (runData.conclusion === 'success') {
+        // Fetch artifacts for this run
+        const artifactsResponse = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}/artifacts`,
+          {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          }
+        );
+        
+        if (artifactsResponse.ok) {
+          const artifactsData = await artifactsResponse.json();
+          if (artifactsData.artifacts && artifactsData.artifacts.length > 0) {
+            // Get the download URL for the first artifact
+            const artifactDownloadUrl = artifactsData.artifacts[0].archive_download_url;
+            return { 
+              status: 'success', 
+              artifactUrl: artifactDownloadUrl 
+            };
           }
         }
-      )
-      
-      if (!runResponse.ok) {
-        throw new Error(`GitHub API error: ${runResponse.status}`)
+        
+        return { status: 'success' };
+      } else {
+        return { status: 'failed' };
       }
-      
-      const runData = await runResponse.json()
-      
-      if (runData.status === 'completed') {
-        if (runData.conclusion === 'success') {
-          return { status: 'success' }
-        } else {
-          return { status: 'failed' }
-        }
-      }
-      
-      return { status: 'pending' }
-    } catch (error) {
-      console.error('Error checking build status:', error)
-      throw error
     }
+    
+    return { status: 'pending' };
+  } catch (error) {
+    console.error('Error checking build status:', error);
+    throw error;
   }
-
+}
+      
   const validateWebsite = async (url: string): Promise<boolean> => {
     try {
       const urlObj = new URL(url)
@@ -366,10 +390,13 @@ export default function APKBuilder() {
   }
 
   const downloadAPK = async () => {
-    if (githubRunId) {
-      window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
-    }
+  if (artifactUrl) {
+   
+    window.open(artifactUrl, '_blank');
+  } else if (githubRunId) {
+    window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank');
   }
+};
 
   const copyAppKey = async () => {
     const keyInfo = `Alias: android\nPassword: 123321\n\nYou will need this key to publish changes to your app.`
