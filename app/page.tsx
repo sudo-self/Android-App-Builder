@@ -366,11 +366,11 @@ export default function APKBuilder() {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
   }
 
- const downloadAPK = async () => {
-  if (githubRunId) {
-    window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+  const downloadAPK = async () => {
+    if (githubRunId) {
+      window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+    }
   }
-}
 
   const copyAppKey = async () => {
     const keyInfo = `Alias: android\nPassword: 123321\n\nYou will need this key to publish changes to your app.`
@@ -623,62 +623,62 @@ export default function APKBuilder() {
                           borderColor: isDarkMode ? '#334155' : '#e2e8f0',
                           backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc'
                         }}>
-  <div className="space-y-2">
-  <Label htmlFor="iconChoice" className={`font-medium flex items-center gap-2 ${
-    isDarkMode ? "text-white" : "text-slate-900"
-  }`}>
-    <Image className="w-4 h-4" />
-    App Icon
-  </Label>
-  
-  {/* Icon Selection Grid */}
-  <div className="grid grid-cols-3 gap-3">
-    {ICON_CHOICES.map((icon) => (
-      <div
-        key={icon.value}
-        className={`flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
-          iconChoice === icon.value
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:text-white'
-            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-slate-800'
-        }`}
-        onClick={() => setIconChoice(icon.value)}
-      >
-        <img
-          src={icon.url}
-          alt={icon.label}
-          className="w-12 h-12 object-contain mb-2"
-        />
-        <span className={`text-xs text-center font-medium ${
-          isDarkMode ? "text-white" : "text-slate-900"
-        }`}>
-          {icon.label}
-        </span>
-      </div>
-    ))}
-  </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="iconChoice" className={`font-medium flex items-center gap-2 ${
+                              isDarkMode ? "text-white" : "text-slate-900"
+                            }`}>
+                              <Image className="w-4 h-4" />
+                              App Icon
+                            </Label>
+                            
+                            {/* Icon Selection Grid */}
+                            <div className="grid grid-cols-3 gap-3">
+                              {ICON_CHOICES.map((icon) => (
+                                <div
+                                  key={icon.value}
+                                  className={`flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                                    iconChoice === icon.value
+                                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:text-white'
+                                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-slate-800'
+                                  }`}
+                                  onClick={() => setIconChoice(icon.value)}
+                                >
+                                  <img
+                                    src={icon.url}
+                                    alt={icon.label}
+                                    className="w-12 h-12 object-contain mb-2"
+                                  />
+                                  <span className={`text-xs text-center font-medium ${
+                                    isDarkMode ? "text-white" : "text-slate-900"
+                                  }`}>
+                                    {icon.label}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
 
-  {/* Fallback dropdown for accessibility */}
-  <select
-    id="iconChoice"
-    value={iconChoice}
-    onChange={(e) => setIconChoice(e.target.value)}
-    className={`w-full p-2 rounded border mt-2 ${
-      isDarkMode
-        ? "bg-slate-800 border-slate-700 text-white"
-        : "bg-white border-slate-300 text-slate-900"
-    }`}
-  >
-    {ICON_CHOICES.map((icon) => (
-      <option key={icon.value} value={icon.value}>
-        {icon.label}
-      </option>
-    ))}
-  </select>
-  
-  <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-500"}`}>
-    Choose the app icon style
-  </p>
-</div>
+                            {/* Fallback dropdown for accessibility */}
+                            <select
+                              id="iconChoice"
+                              value={iconChoice}
+                              onChange={(e) => setIconChoice(e.target.value)}
+                              className={`w-full p-2 rounded border mt-2 ${
+                                isDarkMode
+                                  ? "bg-slate-800 border-slate-700 text-white"
+                                  : "bg-white border-slate-300 text-slate-900"
+                              }`}
+                            >
+                              {ICON_CHOICES.map((icon) => (
+                                <option key={icon.value} value={icon.value}>
+                                  {icon.label}
+                                </option>
+                              ))}
+                            </select>
+                            
+                            <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-500"}`}>
+                              Choose the app icon style
+                            </p>
+                          </div>
 
                           <div className="space-y-2">
                             <Label htmlFor="themeColor" className={`font-medium flex items-center gap-2 ${
@@ -782,7 +782,19 @@ export default function APKBuilder() {
                       ? "bg-slate-900 border-slate-800"
                       : "bg-slate-100 border-slate-300"
                   } rounded-b-[2.5rem]`}
-                />
+                >
+                  <a
+                    href="https://github.com/sudo-self/apk-builder-actions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    <img
+                      src="https://img.shields.io/badge/-sudo--self-lightgrey?style=plastic&logo=github"
+                      alt="sudo-self"
+                      className="h-4"
+                    />
+                  </a>
 
                   <a
                     href="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml"
