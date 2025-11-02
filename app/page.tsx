@@ -484,7 +484,7 @@ export default function APKBuilder() {
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <span className="ml-2">apk.jessejesse.com</span>
+                        <span className="ml-2">Github Actions</span>
                       </div>
 
                       <div className="space-y-2">
@@ -526,7 +526,7 @@ export default function APKBuilder() {
                               rel="noopener noreferrer"
                               className="underline hover:no-underline hover:text-blue-400"
                             >
-                              View live build 
+                              View live build status
                             </a>
                           </div>
                         )}
@@ -539,10 +539,10 @@ export default function APKBuilder() {
                           <Github className="w-8 h-8 text-white" />
                         </div>
                         <h1 className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          apk.JesseJesse.com
+                          Github APK Builder 
                         </h1>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                          Github Actions APK Builder
+                        apk.JesseJesse.com
                         </p>
                       </div>
 
@@ -569,7 +569,7 @@ export default function APKBuilder() {
 
                       <div className="space-y-2">
                         <Label htmlFor="appName" className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Application Name
+                          App Name
                         </Label>
                         <Input
                           id="appName"
@@ -587,7 +587,7 @@ export default function APKBuilder() {
 
                       <div className="space-y-2">
                         <Label htmlFor="hostName" className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                         TLDs .com .net. info .org
+                        Domain (autofilled)
                         </Label>
                         <Input
                           id="hostName"
@@ -631,7 +631,7 @@ export default function APKBuilder() {
                               App Icon
                             </Label>
                             
-                            {/* Icon Selection Grid */}
+                         
                             <div className="grid grid-cols-3 gap-3">
                               {ICON_CHOICES.map((icon) => (
                                 <div
@@ -760,9 +760,19 @@ export default function APKBuilder() {
                         </div>
                       )}
 
-                      <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                        build may take 2-5 minutes
-                      </p>
+                    <p
+  className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
+>
+  <a
+    href="https://apk.jessejesse.com/assetlinks.json"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline"
+  >
+    Deeplink assetlinks.json
+  </a>
+</p>
+
 
                       <Button
                         type="submit"
@@ -783,19 +793,6 @@ export default function APKBuilder() {
                       : "bg-slate-100 border-slate-300"
                   } rounded-b-[2.5rem]`}
                 >
-                  <a
-                    href="https://github.com/sudo-self/apk-builder-actions"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    <img
-                      src="https://img.shields.io/badge/-sudo--self-lightgrey?style=plastic&logo=github"
-                      alt="sudo-self"
-                      className="h-4"
-                    />
-                  </a>
-
                   <a
                     href="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml"
                     target="_blank"
