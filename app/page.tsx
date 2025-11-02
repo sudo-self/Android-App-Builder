@@ -507,7 +507,7 @@ export default function APKBuilder() {
                               rel="noopener noreferrer"
                               className="underline hover:no-underline hover:text-blue-400"
                             >
-                              View build Workflow
+                              View live build 
                             </a>
                           </div>
                         )}
@@ -523,7 +523,7 @@ export default function APKBuilder() {
                           Android App Builder
                         </h1>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                          build your Android app in seconds...
+                          build your Android app in mins
                         </p>
                       </div>
 
@@ -555,7 +555,7 @@ export default function APKBuilder() {
                         <Input
                           id="appName"
                           type="text"
-                          placeholder="your app name"
+                          placeholder="YourApp Name"
                           value={appName}
                           onChange={(e) => setAppName(e.target.value)}
                           className={isDarkMode
@@ -711,7 +711,7 @@ export default function APKBuilder() {
                       )}
 
                       <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                        Builds may take 2-5 minutes
+                        build may take 2-5 minutes
                       </p>
 
                       <Button
