@@ -49,9 +49,9 @@ export default function APKBuilder() {
   const [url, setUrl] = useState("")
   const [appName, setAppName] = useState("")
   const [hostName, setHostName] = useState("")
-  const [themeColor, setThemeColor] = useState("#171717")
-  const [themeColorDark, setThemeColorDark] = useState("#000000")
-  const [backgroundColor, setBackgroundColor] = useState("#FFFFFF")
+  const [themeColor, setThemeColor] = useState("#3b82f6")
+  const [themeColorDark, setThemeColorDark] = useState("#1e40af")
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff")
   const [iconChoice, setIconChoice] = useState("phone")
   const [isComplete, setIsComplete] = useState(false)
   const [isBuilding, setIsBuilding] = useState(false)
@@ -67,6 +67,9 @@ export default function APKBuilder() {
   const [copied, setCopied] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Get selected icon URL
+  const selectedIcon = ICON_CHOICES.find(icon => icon.value === iconChoice) || ICON_CHOICES[0]
 
   const getGitHubToken = (): string | null => {
     if (typeof window === 'undefined') return null
@@ -419,9 +422,9 @@ export default function APKBuilder() {
     setUrl("")
     setAppName("")
     setHostName("")
-    setThemeColor("#171717")
-    setThemeColorDark("#000000")
-    setBackgroundColor("#FFFFFF")
+    setThemeColor("#3b82f6")
+    setThemeColorDark("#1e40af")
+    setBackgroundColor("#ffffff")
     setIconChoice("phone")
     setTerminalLogs([])
     setBuildId(null)
@@ -565,24 +568,38 @@ export default function APKBuilder() {
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
+                      {/* Live Preview Section */}
                       <div className="text-center mb-6">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl mb-3 shadow-lg">
-                          <svg 
-                            className="w-8 h-8 text-white" 
-                            viewBox="0 0 512 470.647"
-                            fill="currentColor"
-                          >
-                            <polygon points="235.793 0 143.978 137.674 143.978 224.949 87.702 224.949 87.702 137.674 0 0 63.25 0 119.018 88.646 175.243 0 235.793 0 235.793 0" />
-                            <path d="M330.294,175.451h-101.861l-20.717,50.024h-45.106l95.38,-224.949h46.137l91.51,224.949h-48.2l-17.144,-50.024zm-16.92,-44.911l-31.226,-82.55l-34.837,82.55h66.063z" />
-                            <polygon points="87.701 250.177 87.701 470.647 135.004 470.647 135.004 318.569 184.509 420.789 221.743 420.789 272.939 314.976 272.939 470.602 318.318 470.602 318.318 250.177 256.358 250.177 201.381 349.883 149.021 250.177 87.701 250.177 87.701 250.177" />
-                            <polygon points="512 422.735 395.638 422.735 395.638 250.125 347.442 250.125 347.442 469.647 512 469.647 512 422.737 512 422.735" />
-                          </svg>
+                        <div 
+                          className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-3 shadow-lg border-2"
+                          style={{
+                            backgroundColor: backgroundColor,
+                            borderColor: themeColor
+                          }}
+                        >
+                          <img 
+                            src={selectedIcon.url} 
+                            alt="App Icon Preview"
+                            className="w-12 h-12 object-contain"
+                            style={{
+                              filter: `drop-shadow(0 2px 4px ${themeColor}40)`
+                            }}
+                          />
                         </div>
-                        <h1 className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          APK Builder
+                        <h1 
+                          className="text-xl font-bold mb-1 truncate max-w-[200px] mx-auto"
+                          style={{ color: themeColor }}
+                        >
+                          {appName || "YourApp"}
                         </h1>
-                        <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                          Create Android APKs no-coding required
+                        <p 
+                          className="text-xs opacity-75"
+                          style={{ color: themeColor }}
+                        >
+                          {hostName || "yourapp.com"}
+                        </p>
+                        <p className={`text-xs mt-2 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
+                          Live Preview
                         </p>
                       </div>
 
@@ -641,8 +658,8 @@ export default function APKBuilder() {
                           }
                           required
                         />
-                        <p className={`text-xs text-center ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                          apk build time averages 1-3 minutes
+                        <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
+                          app build time average 1-3 minutes
                         </p>
                       </div>
 
@@ -655,7 +672,7 @@ export default function APKBuilder() {
                         }`}
                       >
                         <Palette className="w-4 h-4" />
-                        {showAdvanced ? "Hide" : "Show"} Options
+                        {showAdvanced ? "Hide" : "Show"} Advanced Options
                       </Button>
 
                       {showAdvanced && (
