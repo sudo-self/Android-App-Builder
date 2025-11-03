@@ -1,4 +1,5 @@
 "use client"
+
 import type React from "react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -466,7 +467,7 @@ export default function APKBuilder() {
       <img 
         src="./droiddroid.svg" 
         alt="Android Logo"
-        className="w-32 h-32 mb-8"
+        className="w-28 h-28 mb-8"
       />
     </div>
     <div className="flex gap-2 mb-4">
@@ -550,7 +551,7 @@ export default function APKBuilder() {
                               rel="noopener noreferrer"
                               className="underline hover:no-underline hover:text-blue-400"
                             >
-                              View live build
+                              View live build on Github
                             </a>
                           </div>
                         )}
@@ -584,7 +585,7 @@ export default function APKBuilder() {
                           isDarkMode ? "text-white" : "text-slate-900"
                         }`}>
                           <Globe className="w-5 h-5" />
-                          URL
+                          Website
                         </Label>
                         <Input
                           id="url"
@@ -635,7 +636,7 @@ export default function APKBuilder() {
                           required
                         />
                         <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                          Python 3.11  Gradle 8.1  Next.js 15.1
+                          Python  Linux  Gradle  Next.js
                         </p>
                       </div>
 
@@ -798,7 +799,7 @@ export default function APKBuilder() {
                           rel="noopener noreferrer"
                           className="underline hover:text-pink-500"
                         >
-                          About The App
+                          About the App
                         </a>
                       </p>
 
@@ -832,7 +833,7 @@ export default function APKBuilder() {
     <img
       src="https://img.shields.io/github/actions/workflow/status/sudo-self/apk-builder-actions/apk-builder.yml?color=blue&style=plastic"
       alt="APK Builder Workflow Status"
-      className="h-5"
+      className="h-4"
     />
   </a><br />
 </div>
