@@ -533,26 +533,43 @@ export default function APKBuilder() {
               </div>
             ) : (
               <>
-                <div className={`h-12 flex items-center justify-between px-8 text-xs rounded-t-[2.5rem] ${
-                  isDarkMode ? "bg-slate-950 text-white" : "bg-slate-900 text-white"
-                }`}>
-                  <div className="flex items-center gap-3 text-[#3DDC84]">
-                    <span className="font-semibold">{formatTime(currentTime)}</span>
-                    <span className="opacity-80">{formatDate(currentTime)}</span>
-                  </div>
-                  <div className="flex gap-3 items-center text-[#3DDC84]">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.5 11.5 0 0 0-8.94 0L5.65 5.67c-.19-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C4.8 11.16 3.5 13.84 3.5 16.5V19h17v-2.5c0-2.66-1.3-5.34-2.9-7.02zM7 17.25c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75z" />
-                    </svg>
-                    <button
-                      onClick={() => setIsDarkMode(!isDarkMode)}
-                      className="hover:opacity-70 transition-opacity"
-                      aria-label="Toggle theme"
-                    >
-                      {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
+               <div
+  className={`h-12 flex items-center justify-between px-8 text-xs rounded-t-[2.5rem] ${
+    isDarkMode ? "bg-slate-950 text-white" : "bg-slate-900 text-white"
+  }`}
+>
+
+  <div className="flex items-center gap-3 text-[#3DDC84]">
+    <span className="font-semibold">{formatTime(currentTime)}</span>
+    <span className="opacity-80">{formatDate(currentTime)}</span>
+  </div>
+
+
+  <div className="flex gap-4 items-center text-[#3DDC84]">
+
+
+    <a
+      href="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:opacity-80 transition-opacity"
+    >
+      <img
+        src="https://img.shields.io/github/actions/workflow/status/sudo-self/apk-builder-actions/apk-builder.yml?color=blue&style=plastic"
+        alt="APK Builder Workflow Status"
+        className="h-4"
+      />
+    </a>
+
+    <button
+      onClick={() => setIsDarkMode(!isDarkMode)}
+      className="hover:opacity-70 transition-opacity"
+      aria-label="Toggle theme"
+    >
+      {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+    </button>
+  </div>
+</div>
 
                 <div className="h-[calc(100%-3rem-24px)] overflow-y-auto p-6">
                   {isBuilding || isComplete ? (
