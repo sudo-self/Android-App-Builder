@@ -522,9 +522,9 @@ export default function APKBuilder() {
                           <div className="flex items-center gap-2 text-green-400 text-sm">
                             <span className="text-green-600">$</span>
                             <div className="flex gap-1">
-                              <div className="w-1 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                              <div className="w-1 h-3 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-1 h-3 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse"></div>
+                              <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
                             </div>
                             <span>_</span>
                           </div>
@@ -572,7 +572,7 @@ export default function APKBuilder() {
                           </svg>
                         </div>
                         <h1 className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Action APKs
+                          APK Builder
                         </h1>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                           apk.JesseJesse.com
@@ -584,7 +584,7 @@ export default function APKBuilder() {
                           isDarkMode ? "text-white" : "text-slate-900"
                         }`}>
                           <Globe className="w-5 h-5" />
-                          Website URL
+                          URL
                         </Label>
                         <Input
                           id="url"
@@ -635,7 +635,7 @@ export default function APKBuilder() {
                           required
                         />
                         <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                          Python 3.11 . Gradle 8.1 . JDK 17 . Nextjs 15
+                          Python 3.11  Gradle 8.1  Next.js 15.1
                         </p>
                       </div>
 
@@ -834,7 +834,7 @@ export default function APKBuilder() {
       alt="APK Builder Workflow Status"
       className="h-5"
     />
-  </a>
+  </a><br />
 </div>
               </>
             )}
