@@ -626,7 +626,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                           required
                         />
                         <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                        Python 3.11 . Gradle 8.1 . JDK 20
+                        Python 3.11 . Gradle 8.1 . JDK 17 . Nextjs 15
                         </p>
                       </div>
 
