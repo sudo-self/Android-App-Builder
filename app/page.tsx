@@ -932,7 +932,7 @@ export default function APKBuilder() {
                     className="hover:opacity-80 transition-opacity"
                   >
                     <img
-                      src="https://img.shields.io/badge/Apk%20Builder-yml-blue?style=plastic&logo=github"
+                      src="https://img.shields.io/badge/Actions-yml-blue?style=plastic&logo=github"
                       alt="APK Builder"
                       className="h-4"
                     />
@@ -946,7 +946,6 @@ export default function APKBuilder() {
     </div>
   )
 }
-
 
 
 
