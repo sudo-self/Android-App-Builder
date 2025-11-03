@@ -51,7 +51,7 @@ export default function APKBuilder() {
   const [themeColor, setThemeColor] = useState("#171717")
   const [themeColorDark, setThemeColorDark] = useState("#000000")
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF")
-  const [iconChoice, setIconChoice] = useState("phone") // Default to phone icon
+  const [iconChoice, setIconChoice] = useState("phone")
   const [isComplete, setIsComplete] = useState(false)
   const [isBuilding, setIsBuilding] = useState(false)
   const [terminalLogs, setTerminalLogs] = useState<string[]>([])
@@ -135,16 +135,15 @@ export default function APKBuilder() {
       try {
         const result = await checkBuildStatus(githubRunId)
         
-     
-if (result.status === 'success') {
-  setTerminalLogs(prev => [...prev, "Build completed", "APK is ready"]);
-  setIsBuilding(false);
-  setIsComplete(true);
-  
-  if (result.artifactUrl) {
-    setArtifactUrl(result.artifactUrl);
-  }
-} else if (result.status === 'failed') {
+        if (result.status === 'success') {
+          setTerminalLogs(prev => [...prev, "Build completed", "APK is ready"])
+          setIsBuilding(false)
+          setIsComplete(true)
+          
+          if (result.artifactUrl) {
+            setArtifactUrl(result.artifactUrl)
+          }
+        } else if (result.status === 'failed') {
           setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
           setIsBuilding(false)
         } else {
@@ -167,66 +166,64 @@ if (result.status === 'success') {
     }
   }, [isBuilding, githubRunId, buildStartTime])
 
-const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
-  const token = getGitHubToken();
-  if (!token) {
-    throw new Error('GitHub token not configured');
-  }
-  
-  try {
-    const runResponse = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}`,
-      {
-        headers: {
-          'Authorization': `token ${token}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      }
-    );
-    
-    if (!runResponse.ok) {
-      throw new Error(`GitHub API error: ${runResponse.status}`);
+  const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
+    const token = getGitHubToken()
+    if (!token) {
+      throw new Error('GitHub token not configured')
     }
     
-    const runData = await runResponse.json();
-    
-    if (runData.status === 'completed') {
-      if (runData.conclusion === 'success') {
-       
-        const artifactsResponse = await fetch(
-          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}/artifacts`,
-          {
-            headers: {
-              'Authorization': `token ${token}`,
-              'Accept': 'application/vnd.github.v3+json'
+    try {
+      const runResponse = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}`,
+        {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        }
+      )
+      
+      if (!runResponse.ok) {
+        throw new Error(`GitHub API error: ${runResponse.status}`)
+      }
+      
+      const runData = await runResponse.json()
+      
+      if (runData.status === 'completed') {
+        if (runData.conclusion === 'success') {
+          const artifactsResponse = await fetch(
+            `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}/artifacts`,
+            {
+              headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+              }
+            }
+          )
+          
+          if (artifactsResponse.ok) {
+            const artifactsData = await artifactsResponse.json()
+            if (artifactsData.artifacts && artifactsData.artifacts.length > 0) {
+              const artifactDownloadUrl = artifactsData.artifacts[0].archive_download_url
+              return { 
+                status: 'success', 
+                artifactUrl: artifactDownloadUrl 
+              }
             }
           }
-        );
-        
-        if (artifactsResponse.ok) {
-          const artifactsData = await artifactsResponse.json();
-          if (artifactsData.artifacts && artifactsData.artifacts.length > 0) {
-           
-            const artifactDownloadUrl = artifactsData.artifacts[0].archive_download_url;
-            return { 
-              status: 'success', 
-              artifactUrl: artifactDownloadUrl 
-            };
-          }
+          
+          return { status: 'success' }
+        } else {
+          return { status: 'failed' }
         }
-        
-        return { status: 'success' };
-      } else {
-        return { status: 'failed' };
       }
+      
+      return { status: 'pending' }
+    } catch (error) {
+      console.error('Error checking build status:', error)
+      throw error
     }
-    
-    return { status: 'pending' };
-  } catch (error) {
-    console.error('Error checking build status:', error);
-    throw error;
   }
-}
       
   const validateWebsite = async (url: string): Promise<boolean> => {
     try {
@@ -345,10 +342,10 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
         
         setTerminalLogs([
           "building apk...",
-          `${appName}`,
-          `${cleanHostName}`,
-          `${themeColor}`,
-          `${iconChoice}`,
+          `App: ${appName}`,
+          `Host: ${cleanHostName}`,
+          `Theme: ${themeColor}`,
+          `Icon: ${iconChoice}`,
           `ID: ${buildId}`,
           "in progress...",
           ""
@@ -389,13 +386,12 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
   }
 
   const downloadAPK = async () => {
-  if (artifactUrl) {
-   
-    window.open(artifactUrl, '_blank');
-  } else if (githubRunId) {
-    window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank');
+    if (artifactUrl) {
+      window.open(artifactUrl, '_blank')
+    } else if (githubRunId) {
+      window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+    }
   }
-};
 
   const copyAppKey = async () => {
     const keyInfo = `Alias: android\nPassword: 123321\n\nYou will need this key to publish changes to your app.`
@@ -476,10 +472,9 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                   <div className="w-3 h-3 bg-[#3DDC84] rounded-full animate-bounce [animation-delay:-0.15s]" />
                   <div className="w-3 h-3 bg-[#3DDC84] rounded-full animate-bounce" />
                 </div>
-              <div className="flex items-center gap-2">
-  <p className="text-[#3DDC84] text-md font-medium animate-pulse">A N D R O I D</p>
-</div>
-
+                <div className="flex items-center gap-2">
+                  <p className="text-[#3DDC84] text-md font-medium animate-pulse">A N D R O I D</p>
+                </div>
               </div>
             ) : (
               <>
@@ -563,17 +558,16 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="text-center mb-6">
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl mb-3 shadow-lg">
-  <svg 
-    className="w-8 h-8 text-white" 
-    viewBox="0 0 512 470.647"
-    fill="currentColor"
-  >
-    <polygon points="235.793 0 143.978 137.674 143.978 224.949 87.702 224.949 87.702 137.674 0 0 63.25 0 119.018 88.646 175.243 0 235.793 0 235.793 0" />
-    <path d="M330.294,175.451h-101.861l-20.717,50.024h-45.106l95.38,-224.949h46.137l91.51,224.949h-48.2l-17.144,-50.024zm-16.92,-44.911l-31.226,-82.55l-34.837,82.55h66.063z" />
-    <polygon points="87.701 250.177 87.701 470.647 135.004 470.647 135.004 318.569 184.509 420.789 221.743 420.789 272.939 314.976 272.939 470.602 318.318 470.602 318.318 250.177 256.358 250.177 201.381 349.883 149.021 250.177 87.701 250.177 87.701 250.177" />
-    <polygon points="512 422.735 395.638 422.735 395.638 250.125 347.442 250.125 347.442 469.647 512 469.647 512 422.737 512 422.735" />
-  </svg>
-</div>
+                          <svg 
+                            className="w-8 h-8 text-white" 
+                            viewBox="0 0 512 470.647"
+                            fill="currentColor"
+                          >
+                            <polygon points="235.793 0 143.978 137.674 143.978 224.949 87.702 224.949 87.702 137.674 0 0 63.25 0 119.018 88.646 175.243 0 235.793 0 235.793 0" />
+                            <path d="M330.294,175.451h-101.861l-20.717,50.024h-45.106l95.38,-224.949h46.137l91.51,224.949h-48.2l-17.144,-50.024zm-16.92,-44.911l-31.226,-82.55l-34.837,82.55h66.063z" />
+                            <polygon points="87.701 250.177 87.701 470.647 135.004 470.647 135.004 318.569 184.509 420.789 221.743 420.789 272.939 314.976 272.939 470.602 318.318 470.602 318.318 250.177 256.358 250.177 201.381 349.883 149.021 250.177 87.701 250.177 87.701 250.177" />
+                            <polygon points="512 422.735 395.638 422.735 395.638 250.125 347.442 250.125 347.442 469.647 512 469.647 512 422.737 512 422.735" />
+                          </svg>
                         </div>
                         <h1 className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
                           Action APKs
@@ -639,7 +633,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                           required
                         />
                         <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                        Python 3.11 . Gradle 8.1 . JDK 17 . Nextjs 15
+                          Python 3.11 . Gradle 8.1 . JDK 17 . Nextjs 15
                         </p>
                       </div>
 
@@ -836,7 +830,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                       alt="APK Builder Workflow Status"
                       className="h-5"
                     />
-                  </a><br />
+                  </a>
                 </div>
               </>
             )}
