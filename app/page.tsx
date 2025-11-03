@@ -641,8 +641,8 @@ export default function APKBuilder() {
                           }
                           required
                         />
-                        <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                          app build time average 1-3 minutes
+                        <p className={`text-xs text-center ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
+                          apk build time averages 1-3 minutes
                         </p>
                       </div>
 
@@ -655,7 +655,7 @@ export default function APKBuilder() {
                         }`}
                       >
                         <Palette className="w-4 h-4" />
-                        {showAdvanced ? "Hide" : "Show"} Advanced Options
+                        {showAdvanced ? "Hide" : "Show"} Options
                       </Button>
 
                       {showAdvanced && (
