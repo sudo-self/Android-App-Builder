@@ -790,7 +790,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                         className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
                       >
                         <a
-                          href="https://apk.jessejesse.com/assetlinks.json"
+                          href="https://apk.jessejesse.com/buildinfo.json"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="underline hover:text-green-600"
