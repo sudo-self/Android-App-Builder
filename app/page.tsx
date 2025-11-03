@@ -568,7 +568,7 @@ export default function APKBuilder() {
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      {/* Live Preview Section */}
+                     
                       <div className="text-center mb-6">
                         <div 
                           className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-3 shadow-lg border-2"
@@ -599,7 +599,7 @@ export default function APKBuilder() {
                           {hostName || "yourapp.com"}
                         </p>
                         <p className={`text-xs mt-2 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                          Live Preview
+                          live preview
                         </p>
                       </div>
 
