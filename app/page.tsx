@@ -555,9 +555,9 @@ export default function APKBuilder() {
       className="hover:opacity-80 transition-opacity"
     >
       <img
-        src="https://img.shields.io/github/actions/workflow/status/sudo-self/apk-builder-actions/apk-builder.yml?color=blue&style=plastic"
+        src="https://img.shields.io/github/actions/workflow/status/sudo-self/apk-builder-actions/apk-builder.yml?color=green&style=plastic"
         alt="APK Builder Workflow Status"
-        className="h-4"
+        className="h-5"
       />
     </a>
 
