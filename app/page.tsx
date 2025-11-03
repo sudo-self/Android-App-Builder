@@ -658,8 +658,8 @@ export default function APKBuilder() {
                           }
                           required
                         />
-                        <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                          app build time average 1-3 minutes
+                        <p className={`text-xs text-center ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
+                          APK build times average 1-3 minutes
                         </p>
                       </div>
 
@@ -822,7 +822,7 @@ export default function APKBuilder() {
                           rel="noopener noreferrer"
                           className="underline hover:text-pink-500"
                         >
-                          About the App
+                          GitHub Actions Workflow
                         </a>
                       </p>
 
