@@ -791,17 +791,17 @@ export default function APKBuilder() {
                       )}
 
                       <p
-                        className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
-                      >
-                        <a
-                          href="https://apk.jessejesse.com/buildinfo.json"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline hover:text-pink-500"
-                        >
-                          About the App
-                        </a
-                      </p>
+  className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
+>
+  <a
+    href="https://apk.jessejesse.com/buildinfo.json"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline hover:text-pink-500"
+  >
+    About the App
+  </a>
+</p>
 
                       <Button
                         type="submit"
