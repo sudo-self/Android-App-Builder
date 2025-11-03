@@ -477,10 +477,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                   <div className="w-2 h-2 bg-[#3DDC84] rounded-full animate-bounce" />
                 </div>
               <div className="flex items-center gap-2">
-  <p className="text-[#3DDC84] text-sm font-medium animate-pulse">A N D R O I D</p>
-     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.5 11.5 0 0 0-8.94 0L5.65 5.67c-.19-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C4.8 11.16 3.5 13.84 3.5 16.5V19h17v-2.5c0-2.66-1.3-5.34-2.9-7.02zM7 17.25c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75z" />
-                    </svg>
+  <p className="text-[#3DDC84] text-md font-medium animate-pulse">A N D R O I D</p>
 </div>
 
               </div>
@@ -617,7 +614,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
 
                       <div className="space-y-2">
                         <Label htmlFor="hostName" className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Average Build Time 1-3 mins
+                          Average Build Time 75 Seconds
                         </Label>
                         <Input
                           id="hostName"
@@ -801,7 +798,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
 
                       <Button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-6 rounded-xl text-base font-semibold shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-700 hover:to-cyan-800 text-white py-6 rounded-xl text-base font-semibold shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={!url || !appName || !hostName}
                       >
                         <Github className="w-5 h-5 mr-2" />
@@ -827,7 +824,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                     <img
                       src="https://github.com/sudo-self/apk-builder-actions/actions/workflows/apk-builder.yml/badge.svg"
                       alt="APK Builder Workflow Status"
-                      className="h-4"
+                      className="h-5"
                     />
                   </a>
                 </div>
