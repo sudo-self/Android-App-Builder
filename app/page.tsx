@@ -360,10 +360,10 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
           setGithubRunId(runId)
           setTerminalLogs(prev => [
             ...prev,
-            `GitHub Actions started successfully`,
+            `GitHub Actions`,
             `Run ID: ${runId}`,
-            "build in progress...",
-            "may take 2-5 minutes...",
+            "build in progress",
+            "creating artifact",
             ""
           ])
         } else {
@@ -476,7 +476,11 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                   <div className="w-2 h-2 bg-[#3DDC84] rounded-full animate-bounce [animation-delay:-0.15s]" />
                   <div className="w-2 h-2 bg-[#3DDC84] rounded-full animate-bounce" />
                 </div>
-                <p className="text-[#3DDC84] text-sm font-medium animate-pulse">A N D R O I D</p>
+              <div className="flex items-center gap-2">
+  <p className="text-[#3DDC84] text-sm font-medium animate-pulse">A N D R O I D</p>
+  <img src="./androidboot.svg" alt="Android Boot Logo" className="h-4 w-auto" />
+</div>
+
               </div>
             ) : (
               <>
