@@ -577,7 +577,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                         <Label htmlFor="url" className={`font-medium flex items-center gap-2 ${
                           isDarkMode ? "text-white" : "text-slate-900"
                         }`}>
-                          <Globe className="w-4 h-4" />
+                          <Globe className="w-5 h-5" />
                           Website URL
                         </Label>
                         <Input
@@ -826,7 +826,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                       alt="APK Builder Workflow Status"
                       className="h-5"
                     />
-                  </a>
+                  </a><br />
                 </div>
               </>
             )}
