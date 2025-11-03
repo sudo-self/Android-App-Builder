@@ -25,6 +25,7 @@ interface BuildData {
 interface BuildStatus {
   status: 'pending' | 'success' | 'failed' | 'unknown'
   artifactUrl?: string
+  artifactId?: string
 }
 
 const ICON_CHOICES = [
@@ -62,6 +63,7 @@ export default function APKBuilder() {
   const [buildId, setBuildId] = useState<string | null>(null)
   const [githubRunId, setGithubRunId] = useState<string | null>(null)
   const [artifactUrl, setArtifactUrl] = useState<string | null>(null)
+  const [artifactId, setArtifactId] = useState<string | null>(null)
   const [buildStartTime, setBuildStartTime] = useState<number>(0)
   const [showAppKey, setShowAppKey] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -147,6 +149,9 @@ export default function APKBuilder() {
           if (result.artifactUrl) {
             setArtifactUrl(result.artifactUrl)
           }
+          if (result.artifactId) {
+            setArtifactId(result.artifactId)
+          }
         } else if (result.status === 'failed') {
           setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
           setIsBuilding(false)
@@ -208,10 +213,12 @@ export default function APKBuilder() {
           if (artifactsResponse.ok) {
             const artifactsData = await artifactsResponse.json()
             if (artifactsData.artifacts && artifactsData.artifacts.length > 0) {
-              const artifactDownloadUrl = artifactsData.artifacts[0].archive_download_url
+              const artifact = artifactsData.artifacts[0]
+              const artifactDownloadUrl = artifact.archive_download_url
               return { 
                 status: 'success', 
-                artifactUrl: artifactDownloadUrl 
+                artifactUrl: artifactDownloadUrl,
+                artifactId: artifact.id.toString()
               }
             }
           }
@@ -320,6 +327,7 @@ export default function APKBuilder() {
       setTerminalLogs([])
       setGithubRunId(null)
       setArtifactUrl(null)
+      setArtifactId(null)
       setBuildStartTime(Date.now())
       setShowAppKey(false)
 
@@ -346,12 +354,12 @@ export default function APKBuilder() {
         
         setTerminalLogs([
           "building apk...",
-          `App: ${appName}`,
-          `Host: ${cleanHostName}`,
-          `Theme: ${themeColor}`,
-          `Icon: ${iconChoice}`,
+          `${appName}`,
+          `${cleanHostName}`,
+          `${themeColor}`,
+          `${iconChoice}`,
           `ID: ${buildId}`,
-          "in progress...",
+          "actions yml...",
           ""
         ])
 
@@ -361,7 +369,7 @@ export default function APKBuilder() {
           setGithubRunId(runId)
           setTerminalLogs(prev => [
             ...prev,
-            `GitHub Actions`,
+            `Linux Gradle...`,
             `Run ID: ${runId}`,
             "build in progress",
             "creating artifact",
@@ -390,10 +398,44 @@ export default function APKBuilder() {
   }
 
   const downloadAPK = async () => {
-    if (artifactUrl) {
-      window.open(artifactUrl, '_blank')
-    } else if (githubRunId) {
-      window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+    try {
+      if (artifactId) {
+    
+        const token = getGitHubToken()
+        if (!token) {
+          setError('GitHub token required for download')
+          return
+        }
+
+     
+        const downloadUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/artifacts/${artifactId}/zip`
+        
+     
+        const iframe = document.createElement('iframe')
+        iframe.style.display = 'none'
+        iframe.src = downloadUrl
+        document.body.appendChild(iframe)
+        
+     
+        setTimeout(() => {
+          document.body.removeChild(iframe)
+        }, 5000)
+        
+      } else if (githubRunId) {
+     
+        window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+      } else if (artifactUrl) {
+     
+        window.open(artifactUrl, '_blank')
+      }
+    } catch (error: any) {
+      console.error('Download error:', error)
+      setError(`Download failed: ${error.message}`)
+      
+   
+      if (githubRunId) {
+        window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+      }
     }
   }
 
@@ -430,6 +472,7 @@ export default function APKBuilder() {
     setBuildId(null)
     setGithubRunId(null)
     setArtifactUrl(null)
+    setArtifactId(null)
     setBuildStartTime(0)
     setShowAppKey(false)
     setCopied(false)
@@ -541,7 +584,7 @@ export default function APKBuilder() {
                         )}
 
                         {isComplete && (
-                          <div className="mt-4 pt-4 border-t border-slate-700">
+                          <div className="mt-4 pt-4 border-t border-slate-700 space-y-3">
                             <Button
                               onClick={downloadAPK}
                               className="w-full bg-green-600 hover:bg-green-700 text-white"
@@ -549,10 +592,30 @@ export default function APKBuilder() {
                               <Download className="w-4 h-4 mr-2" />
                               Download APK
                             </Button>
+                            
+                            {githubRunId && (
+                              <Button
+                                onClick={() => window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')}
+                                variant="outline"
+                                className="w-full text-green-400 border-green-400 hover:bg-green-400 hover:text-black"
+                              >
+                                <Github className="w-4 h-4 mr-2" />
+                                View Build Details
+                              </Button>
+                            )}
+                            
+                            <Button
+                              onClick={resetForm}
+                              variant="ghost"
+                              className="w-full text-gray-400 hover:text-white"
+                            >
+                              <RefreshCw className="w-4 h-4 mr-2" />
+                              Build Another APK
+                            </Button>
                           </div>
                         )}
 
-                        {githubRunId && (
+                        {githubRunId && isBuilding && (
                           <div className="text-gray-400 text-xs text-center mt-4 pt-2 border-t border-slate-700">
                             <a 
                               href={`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`}
@@ -560,7 +623,7 @@ export default function APKBuilder() {
                               rel="noopener noreferrer"
                               className="underline hover:no-underline hover:text-blue-400"
                             >
-                              View live build on Github
+                              View live build on GitHub
                             </a>
                           </div>
                         )}
