@@ -478,7 +478,9 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                 </div>
               <div className="flex items-center gap-2">
   <p className="text-[#3DDC84] text-sm font-medium animate-pulse">A N D R O I D</p>
-  <img src="./androidboot.svg" alt="Android Boot Logo" className="h-4 w-auto" />
+     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.5 11.5 0 0 0-8.94 0L5.65 5.67c-.19-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C4.8 11.16 3.5 13.84 3.5 16.5V19h17v-2.5c0-2.66-1.3-5.34-2.9-7.02zM7 17.25c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75z" />
+                    </svg>
 </div>
 
               </div>
@@ -530,7 +532,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                               <div className="w-1 h-3 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
                               <div className="w-1 h-3 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
                             </div>
-                            <span>Andr</span>
+                            <span>_</span>
                           </div>
                         )}
 
@@ -615,7 +617,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
 
                       <div className="space-y-2">
                         <Label htmlFor="hostName" className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Average Build 1 min
+                          Average Build Time 1-3 mins
                         </Label>
                         <Input
                           id="hostName"
@@ -793,7 +795,7 @@ const checkBuildStatus = async (runId: string): Promise<BuildStatus> => {
                           rel="noopener noreferrer"
                           className="underline hover:text-green-600"
                         >
-                          assetlinks.json
+                          Build Info
                         </a>
                       </p>
 
