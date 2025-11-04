@@ -20,6 +20,7 @@ interface BuildData {
   themeColorDark: string
   backgroundColor: string
   iconChoice: string
+  iconUrl: string // Added iconUrl to pass to GitHub action
 }
 
 interface BuildStatus {
@@ -348,6 +349,7 @@ export default function APKBuilder() {
           .replace(/^www\./, '')
           .replace(/\/$/, '')
         
+        // CRITICAL FIX: Pass the icon URL to GitHub action
         const buildData: BuildData = {
           buildId,
           hostName: cleanHostName,
@@ -357,7 +359,8 @@ export default function APKBuilder() {
           themeColor: themeColor,
           themeColorDark: themeColorDark,
           backgroundColor: backgroundColor,
-          iconChoice: iconChoice
+          iconChoice: iconChoice,
+          iconUrl: selectedIcon.url // Pass the actual icon URL
         }
         
         setTerminalLogs([
@@ -367,7 +370,8 @@ export default function APKBuilder() {
           `${themeColor}`,
           `${iconChoice}`,
           `ID: ${buildId}`,
-          "actions yml...",
+          "downloading custom icon...",
+          "configuring app theme...",
           ""
         ])
 
@@ -380,6 +384,7 @@ export default function APKBuilder() {
             `Linux Gradle...`,
             `Run ID: ${runId}`,
             "build in progress",
+            "replacing default icons...",
             "creating artifact",
             ""
           ])
@@ -417,16 +422,9 @@ export default function APKBuilder() {
           return
         }
 
-        // Create a direct download link
+        // FIXED: Proper APK download with correct filename
         const downloadUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/artifacts/${artifactId}/zip`
         
-        // Create a temporary anchor element to trigger download
-        const a = document.createElement('a')
-        a.href = downloadUrl
-        a.download = artifactName || `${appName}_app.zip`
-        a.style.display = 'none'
-        
-        // Add authorization header through fetch and blob approach
         try {
           const response = await fetch(downloadUrl, {
             headers: {
@@ -437,22 +435,34 @@ export default function APKBuilder() {
           
           if (response.ok) {
             const blob = await response.blob()
+            
+            // FIXED: Create proper APK filename with extension
+            const safeAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+            const filename = `${safeAppName}_${buildId || 'app'}.apk`
+            
+            // Create download link
             const blobUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
             a.href = blobUrl
+            a.download = filename // This ensures .apk extension
+            a.style.display = 'none'
+            
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
             URL.revokeObjectURL(blobUrl)
-            setDownloadStatus('success')
             
-            // Reset success status after 3 seconds
+            setDownloadStatus('success')
             setTimeout(() => setDownloadStatus('idle'), 3000)
           } else {
             throw new Error(`Download failed: ${response.status}`)
           }
         } catch (fetchError) {
-          // Fallback: open in new tab for manual download
-          window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+          console.error('Direct download failed, falling back to GitHub:', fetchError)
+          // Fallback: open GitHub actions page for manual download
+          if (githubRunId) {
+            window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+          }
           setDownloadStatus('idle')
         }
         
@@ -466,7 +476,7 @@ export default function APKBuilder() {
       setError(`Download failed: ${error.message}`)
       setDownloadStatus('error')
       
-      // Fallback to GitHub actions page
+      // Final fallback to GitHub actions page
       if (githubRunId) {
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
       }
@@ -689,7 +699,7 @@ export default function APKBuilder() {
                                 <p className="font-medium mb-1">Download Instructions:</p>
                                 <ol className="list-decimal list-inside space-y-1">
                                   <li>Click Download APK above</li>
-                                  <li>Extract the ZIP file on your device</li>
+                                  <li>File will download as <code>.apk</code></li>
                                   <li>Install the APK on your Android phone</li>
                                   <li>Enable "Install from unknown sources" if needed</li>
                                 </ol>
@@ -874,7 +884,7 @@ export default function APKBuilder() {
                             </select>
                             
                             <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-500"}`}>
-                              Choose the app icon style
+                              Choose the app icon style - this will replace the default launcher icon
                             </p>
                           </div>
 
