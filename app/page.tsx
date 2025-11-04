@@ -1000,14 +1000,14 @@ export default function APKBuilder() {
                   } rounded-b-[2.5rem]`}
                 >
                   <a
-                    href="https://github.com/sudo-self/apk-builder-actions"
+                    href="https://www.npmjs.com/package/apk-builder-cli"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:opacity-80 transition-opacity"
                   >
                     <img
                       src="https://img.shields.io/badge/npm-apk--builder--cli-red?style=plastic&logo=npm"
-                      alt="npm - apk--builder--cli"
+                      alt="npm"
                       className="h-4"
                     />
                   </a>
