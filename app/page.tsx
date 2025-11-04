@@ -754,10 +754,10 @@ export default function APKBuilder() {
                           {hostName || "yourapp.com"}
                         </p>
                         <p className={`text-xs mt-2 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                         build native Android applications with GitHub
+                         build native Android apps with Kotlin
                         </p>
                          <p className={`text-xs mt-2 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                        Kotlin MainActivity.kt imports webkit.WebView 
+                          webkit.WebView 
                         </p>
                       </div>
 
@@ -886,7 +886,7 @@ export default function APKBuilder() {
                             </select>
                             
                             <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-500"}`}>
-                              Choose the app icon style - this will replace the default launcher icon
+                              Choose the app icon style - default launcher icon
                             </p>
                           </div>
 
