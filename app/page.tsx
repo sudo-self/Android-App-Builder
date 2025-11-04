@@ -349,7 +349,7 @@ export default function APKBuilder() {
           .replace(/^www\./, '')
           .replace(/\/$/, '')
         
-        // CRITICAL FIX: Pass the icon URL to GitHub action
+
         const buildData: BuildData = {
           buildId,
           hostName: cleanHostName,
@@ -360,7 +360,7 @@ export default function APKBuilder() {
           themeColorDark: themeColorDark,
           backgroundColor: backgroundColor,
           iconChoice: iconChoice,
-          iconUrl: selectedIcon.url // Pass the actual icon URL
+          iconUrl: selectedIcon.url 
         }
         
         setTerminalLogs([
@@ -422,7 +422,6 @@ export default function APKBuilder() {
           return
         }
 
-        // FIXED: Proper APK download with correct filename
         const downloadUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/artifacts/${artifactId}/zip`
         
         try {
@@ -459,7 +458,7 @@ export default function APKBuilder() {
           }
         } catch (fetchError) {
           console.error('Direct download failed, falling back to GitHub:', fetchError)
-          // Fallback: open GitHub actions page for manual download
+     
           if (githubRunId) {
             window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
           }
@@ -467,7 +466,7 @@ export default function APKBuilder() {
         }
         
       } else if (githubRunId) {
-        // Fallback: open GitHub actions page
+    
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
         setDownloadStatus('idle')
       }
@@ -476,7 +475,7 @@ export default function APKBuilder() {
       setError(`Download failed: ${error.message}`)
       setDownloadStatus('error')
       
-      // Final fallback to GitHub actions page
+
       if (githubRunId) {
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
       }
@@ -644,7 +643,7 @@ export default function APKBuilder() {
                               <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-2" />
                               <h3 className="text-green-400 font-semibold">APK Ready!</h3>
                               <p className="text-gray-400 text-sm mt-1">
-                                Your Android app has been built successfully
+                                Your Android app was built successfully
                               </p>
                             </div>
 
@@ -972,12 +971,12 @@ export default function APKBuilder() {
                         className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
                       >
                         <a
-                          href="https://www.npmjs.com/package/apk-builder-cli"
+                          href="https://apk.jessejesse.com"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="underline hover:text-red-500"
+                          className="underline hover:text-green-500"
                         >
-                          npm i apk-builder-cli
+                          apk.jessejesse.com
                         </a>
                       </p>
 
@@ -1007,7 +1006,7 @@ export default function APKBuilder() {
                     className="hover:opacity-80 transition-opacity"
                   >
                     <img
-                      src="https://img.shields.io/badge/npm-apk--builder--cli-red?style=plastic&logo=npm"
+                      src="https://img.shields.io/badge/npx-apk--builder--cli-red?style=plastic&logo=npm"
                       alt="npm"
                       className="h-4"
                     />
