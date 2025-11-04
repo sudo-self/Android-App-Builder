@@ -754,7 +754,7 @@ export default function APKBuilder() {
                           {hostName || "yourapp.com"}
                         </p>
                         <p className={`text-xs mt-2 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                          Transform websites into native Android applications
+                         Create native Android applications
                         </p>
                       </div>
 
