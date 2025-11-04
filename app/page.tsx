@@ -572,7 +572,7 @@ export default function APKBuilder() {
                   <div className="w-3 h-3 bg-[#3DDC84] rounded-full animate-bounce" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-[#3DDC84] text-lg font-medium animate-pulse">A p k  B u i l d e r</p>
+                  <p className="text-[#3DDC84] text-lg font-medium animate-pulse">A N D R O I D</p>
                 </div>
               </div>
             ) : (
