@@ -1005,9 +1005,9 @@ export default function APKBuilder() {
                           href="https://apk.jessejesse.com"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="underline hover:text-green-500"
+                          className="underline hover:text-red-500"
                         >
-                          apk.jessejesse.com
+                          RESET BUILDER
                         </a>
                       </p>
 
