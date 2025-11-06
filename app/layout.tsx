@@ -8,15 +8,15 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://apk.jessejesse.com"),
-  title: "Android APK Builder – Build Apps in Seconds",
+  title: "Android APK Builder – Create Custom Apps in Seconds",
   description:
-    "Build Android apps in seconds with our APK Builder. Upload your website, configure settings, and generate custom APKs instantly with GitHub Actions.",
+    "Create custom Android apps in seconds with our APK Builder. Upload your site, configure settings, and instantly generate APKs with GitHub Actions.",
   generator: "Github actions",
 
   openGraph: {
-    title: "Android APK Builder – Build Apps in Seconds",
+    title: "Android APK Builder – Create Custom Apps in Seconds",
     description:
-      "Build Android apps in seconds with our APK Builder. Upload your website, configure settings, and generate custom APKs instantly with GitHub Actions.",
+      "Create custom Android apps in seconds with our APK Builder. Upload your site, configure settings, and instantly generate APKs with GitHub Actions.",
     url: "https://apk.jessejesse.com",
     siteName: "APK Builder",
     images: [
@@ -32,12 +32,13 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Android APK Builder – Build Apps in Seconds",
+    title: "Android APK Builder – Create Custom Apps in Seconds",
     description:
-      "Build Android apps in seconds with our APK Builder. Upload your website, configure settings, and generate custom APKs instantly with GitHub Actions.",
+      "Create custom Android apps in seconds with our APK Builder. Upload your site, configure settings, and instantly generate APKs with GitHub Actions.",
     images: ["/og-image.png"],
   },
 }
+
 
 export default function RootLayout({
   children,
