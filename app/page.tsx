@@ -845,7 +845,7 @@ export default function APKBuilder() {
                         </Label>
                       </div>
                       <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-                        When enabled, the APK will be published as a GitHub release
+                        publish APK as a GitHub release
                       </p>
 
                       <Button
