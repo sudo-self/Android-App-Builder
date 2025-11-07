@@ -675,7 +675,7 @@ export default function APKBuilder() {
     setPreviewUrl("")
   }
 
-  return (
+return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div 
@@ -860,33 +860,36 @@ export default function APKBuilder() {
                                 </Button>
                               </div>
 
-  <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
-  <p className="font-medium mb-1">Download Instructions</p>
-  <ol className="list-decimal list-inside space-y-1">
-    <li>Click "Download APK"</li>
-    <li>Enable "install from unknown sources"</li>
-    <li>Install the APK</li>
-  </ol>
-  {githubRunId && artifactId && (
-    <>
-      <p className="mt-2 text-green-400">
-        BUILD: {githubRunId}
-      </p>
-      <p className="mt-2 text-pink-400">
-        APK: {artifactId}
-      </p>
-    </>
-  )}
-</div>
+                              <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
+                                <p className="font-medium mb-1">Download Instructions</p>
+                                <ol className="list-decimal list-inside space-y-1">
+                                  <li>Click "Download APK"</li>
+                                  <li>Enable "install from unknown sources"</li>
+                                  <li>Install the APK</li>
+                                </ol>
+                                {githubRunId && artifactId && (
+                                  <div>
+                                    <p className="mt-2 text-green-400">
+                                      BUILD: {githubRunId}
+                                    </p>
+                                    <p className="mt-2 text-pink-400">
+                                      APK: {artifactId}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
 
-                        {githubRunId && isBuilding && (
-                          <div className="text-gray-400 text-xs text-center mt-4 pt-2 border-t border-slate-700">
-                            <button 
-                              onClick={() => window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')}
-                              className="underline hover:no-underline hover:text-blue-400 text-blue-300"
-                            >
-                              View live build on GitHub →
-                            </button>
+                            {githubRunId && isBuilding && (
+                              <div className="text-gray-400 text-xs text-center mt-4 pt-2 border-t border-slate-700">
+                                <button 
+                                  onClick={() => window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')}
+                                  className="underline hover:no-underline hover:text-blue-400 text-blue-300"
+                                >
+                                  View live build on GitHub →
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
