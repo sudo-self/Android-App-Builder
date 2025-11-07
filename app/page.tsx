@@ -925,7 +925,7 @@ export default function APKBuilder() {
                          build native Android apps
                         </p>
                          <p className={`text-xs mt-1 ${isDarkMode ? "text-green-400" : "text-pink-600"}`}>
-                          webkit.WebView
+                          High Quality APKs
                         </p>
                       </div>
 
@@ -957,7 +957,7 @@ export default function APKBuilder() {
                         className="w-full flex items-center justify-center gap-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
                       >
                         <Play className="w-4 h-4" />
-                        Test Website
+                        Test URL
                       </Button>
 
                       <div className="flex items-center space-x-2 p-3 rounded-lg border" style={{
@@ -975,7 +975,7 @@ export default function APKBuilder() {
                           isDarkMode ? "text-white" : "text-slate-900"
                         }`}>
                           <Upload className="w-4 h-4" />
-                          Publish GitHub Release
+                          GitHub Release (optional)
                         </Label>
                       </div>
                       <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
@@ -1138,7 +1138,7 @@ export default function APKBuilder() {
                         disabled={!url || !appName || !hostName}
                       >
                         <Github className="w-5 h-5 mr-2" />
-                        Build APK
+                        Build APP
                       </Button>
                     </form>
                   ))}
@@ -1158,9 +1158,9 @@ export default function APKBuilder() {
                     className="hover:opacity-80 transition-opacity"
                   >
                     <img
-                      src="https://img.shields.io/badge/-android--app--builder-informational?style=plastic&logo=github&logoColor=black"
+                      src="https://img.shields.io/badge/-android--app--builder-informational?style=plastic&logo=github&logoColor=white"
                       alt="npm"
-                      className="h-4"
+                      className="h-5"
                     />
                   </a>
                 </div>
