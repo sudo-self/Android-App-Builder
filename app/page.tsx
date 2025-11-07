@@ -89,7 +89,7 @@ export default function APKBuilder() {
   const [error, setError] = useState<string | null>(null)
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'success' | 'error'>('idle')
 
-  // Get selected icon URL
+
   const selectedIcon = ICON_CHOICES.find(icon => icon.value === iconChoice) || ICON_CHOICES[0]
 
   const getGitHubToken = (): string | null => {
@@ -164,7 +164,7 @@ export default function APKBuilder() {
         const result = await checkBuildStatus(githubRunId)
         
         if (result.status === 'success') {
-          setTerminalLogs(prev => [...prev, "✅ Build completed", "📦 APK is ready"])
+          setTerminalLogs(prev => [...prev, "Build completed", "APK is ready"])
           setIsBuilding(false)
           setIsComplete(true)
           
@@ -178,12 +178,12 @@ export default function APKBuilder() {
             setArtifactName(result.artifactName)
           }
         } else if (result.status === 'failed') {
-          setTerminalLogs(prev => [...prev, "❌ Build failed. Check GitHub Actions for details"])
+          setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
           setIsBuilding(false)
         } else {
           const elapsedMinutes = Math.floor((Date.now() - buildStartTime) / 60000)
           if (pollCount % 6 === 0) {
-            setTerminalLogs(prev => [...prev, `🔄 Building... (${elapsedMinutes}m elapsed)`])
+            setTerminalLogs(prev => [...prev, `Building... (${elapsedMinutes}m elapsed)`])
           }
           setTimeout(pollBuildStatus, 10000)
         }
@@ -479,9 +479,9 @@ export default function APKBuilder() {
           `${themeColor}`,
           `${iconChoice}`,
           `Release: ${publishRelease ? 'Yes' : 'No'}`,
-          `Build ID: ${buildId}`,
+          `ID: ${buildId}`,
           "Downloading icon",
-          "Configuring app",
+          "creating download",
           ""
         ])
 
@@ -506,7 +506,7 @@ export default function APKBuilder() {
       } catch (error: any) {
         console.error('Build error:', error)
         const errorMessage = error.message || 'Unknown error occurred'
-        setTerminalLogs(prev => [...prev, `❌ Build failed: ${errorMessage}`])
+        setTerminalLogs(prev => [...prev, `Build failed: ${errorMessage}`])
         setError(errorMessage)
         setIsBuilding(false)
       }
@@ -745,7 +745,7 @@ export default function APKBuilder() {
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <span className="ml-2">Command Line</span>
+                        <span className="ml-2">APK Terminal</span>
                       </div>
 
                       <div className="space-y-2">
