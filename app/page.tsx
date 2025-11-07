@@ -869,7 +869,10 @@ export default function APKBuilder() {
                                 </ol>
                                 {githubRunId && artifactId && (
                                   <p className="mt-2 text-green-400">
-                                  #{githubRunId} #{artifactId}
+                                  BUILD: {githubRunId}
+                                  </p>
+                                  <p className="mt-2 text-pink-400">
+                                  APK: {artifactId}
                                   </p>
                                 )}
                               </div>
