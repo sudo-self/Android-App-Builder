@@ -298,7 +298,7 @@ export default function APKBuilder() {
     }
 
     try {
-      // Verify the repository exists and we have access
+ 
       const repoResponse = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`,
         {
@@ -321,9 +321,9 @@ export default function APKBuilder() {
         throw new Error(`GitHub API error: ${repoResponse.status} - ${repoResponse.statusText}`)
       }
 
-      // FIX: Combine ALL properties into a single JSON string to stay within 10-property limit
+
       const combinedPayload = {
-        // Single property containing all build data as JSON
+      
         buildConfig: JSON.stringify({
           buildId: buildData.buildId,
           hostName: buildData.hostName,
@@ -379,10 +379,10 @@ export default function APKBuilder() {
         }
       }
 
-      // Wait for the workflow to start
+  
       await new Promise(resolve => setTimeout(resolve, 8000))
 
-      // Poll for the workflow run with more attempts
+   
       for (let attempt = 0; attempt < 12; attempt++) {
         const runsResponse = await fetch(
           `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=5&sort=created&direction=desc`,
@@ -398,7 +398,7 @@ export default function APKBuilder() {
         if (runsResponse.ok) {
           const runsData = await runsResponse.json()
           if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
-            // Find the most recent repository_dispatch run
+       
             const recentRun = runsData.workflow_runs.find((run: any) => 
               run.event === 'repository_dispatch' && 
               run.status === 'in_progress'
@@ -703,7 +703,7 @@ export default function APKBuilder() {
                   <div className="w-3 h-3 bg-[#3DDC84] rounded-full animate-bounce" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-[#3DDC84] text-lg font-medium animate-pulse">A N D R O I D</p>
+                  <p className="text-[#3DDC84] text-lg font-medium animate-pulse">APP BUILDER</p>
                 </div>
               </div>
             ) : (
