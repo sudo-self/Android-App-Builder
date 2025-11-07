@@ -29,7 +29,6 @@ interface BuildStatus {
   artifactUrl?: string
   artifactId?: string
   artifactName?: string
-  downloadUrl?: string
 }
 
 interface GitHubArtifact {
@@ -89,7 +88,6 @@ export default function APKBuilder() {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'success' | 'error'>('idle')
-  const [directDownloadUrl, setDirectDownloadUrl] = useState<string | null>(null)
 
   // Get selected icon URL
   const selectedIcon = ICON_CHOICES.find(icon => icon.value === iconChoice) || ICON_CHOICES[0]
@@ -179,9 +177,6 @@ export default function APKBuilder() {
           if (result.artifactName) {
             setArtifactName(result.artifactName)
           }
-          if (result.downloadUrl) {
-            setDirectDownloadUrl(result.downloadUrl)
-          }
         } else if (result.status === 'failed') {
           setTerminalLogs(prev => [...prev, "❌ Build failed. Check GitHub Actions for details"])
           setIsBuilding(false)
@@ -258,15 +253,11 @@ export default function APKBuilder() {
             if (artifactsData.artifacts && artifactsData.artifacts.length > 0) {
               const artifact: GitHubArtifact = artifactsData.artifacts[0]
               if (!artifact.expired) {
-                // Create direct download URL that user can click
-                const directUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}/artifacts/${artifact.id}`
-                
                 return { 
                   status: 'success', 
                   artifactUrl: artifact.archive_download_url,
                   artifactId: artifact.id.toString(),
-                  artifactName: artifact.name,
-                  downloadUrl: directUrl
+                  artifactName: artifact.name
                 }
               } else {
                 throw new Error('Artifact has expired')
@@ -456,7 +447,6 @@ export default function APKBuilder() {
       setGithubRunId(null)
       setArtifactUrl(null)
       setArtifactId(null)
-      setDirectDownloadUrl(null)
       setBuildStartTime(Date.now())
       setShowAppKey(false)
       setDownloadStatus('idle')
@@ -534,18 +524,27 @@ export default function APKBuilder() {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
   }
 
+  const getGitHubArtifactUrl = (): string | null => {
+    if (githubRunId && artifactId) {
+      return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}/artifacts/${artifactId}`
+    }
+    return null
+  }
+
   const downloadAPK = async () => {
     try {
       setDownloadStatus('downloading')
       
-      if (directDownloadUrl) {
-        // Use the direct GitHub download page - this is the most reliable method
-        window.open(directDownloadUrl, '_blank')
+      // Method 1: Direct GitHub artifact page (most reliable)
+      const githubArtifactUrl = getGitHubArtifactUrl()
+      if (githubArtifactUrl) {
+        window.open(githubArtifactUrl, '_blank')
         setDownloadStatus('success')
         setTimeout(() => setDownloadStatus('idle'), 3000)
         return
       }
       
+      // Method 2: GitHub API download (falls back to ZIP)
       if (artifactId) {
         const token = getGitHubToken()
         if (!token) {
@@ -567,15 +566,20 @@ export default function APKBuilder() {
           if (response.ok) {
             const blob = await response.blob()
             
-            // GitHub returns a ZIP file, not the APK directly
-            // Extract APK from ZIP or redirect to GitHub page
-            console.log('Downloaded ZIP artifact, redirecting to GitHub page...')
+            // GitHub returns a ZIP file containing the APK
+            const safeAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+            const filename = `${safeAppName}_${buildId || 'app'}.zip`
             
-            // Fallback to GitHub page since we can't easily extract APK from ZIP in browser
-            if (githubRunId && artifactId) {
-              const githubArtifactUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}/artifacts/${artifactId}`
-              window.open(githubArtifactUrl, '_blank')
-            }
+            const blobUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = blobUrl
+            a.download = filename
+            a.style.display = 'none'
+            
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(blobUrl)
             
             setDownloadStatus('success')
             setTimeout(() => setDownloadStatus('idle'), 3000)
@@ -583,21 +587,20 @@ export default function APKBuilder() {
             throw new Error(`Download failed: ${response.status}`)
           }
         } catch (fetchError) {
-          console.error('Direct download failed, falling back to GitHub:', fetchError)
+          console.error('Direct download failed, falling back to GitHub page:', fetchError)
           // Fallback to GitHub Actions page
-          if (githubRunId && artifactId) {
-            const githubArtifactUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}/artifacts/${artifactId}`
-            window.open(githubArtifactUrl, '_blank')
+          if (githubRunId) {
+            window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
           }
           setDownloadStatus('idle')
         }
         
       } else if (githubRunId) {
-        // No artifact ID, open GitHub Actions page
+        // Method 3: Just open the GitHub Actions run page
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
         setDownloadStatus('idle')
       } else {
-        setError('No download available')
+        setError('No download available - build may not be complete')
         setDownloadStatus('error')
       }
     } catch (error: any) {
@@ -605,7 +608,7 @@ export default function APKBuilder() {
       setError(`Download failed: ${error.message}`)
       setDownloadStatus('error')
       
-      // Fallback to GitHub Actions page
+      // Final fallback
       if (githubRunId) {
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
       }
@@ -647,7 +650,6 @@ export default function APKBuilder() {
     setGithubRunId(null)
     setArtifactUrl(null)
     setArtifactId(null)
-    setDirectDownloadUrl(null)
     setBuildStartTime(0)
     setShowAppKey(false)
     setCopied(false)
@@ -809,7 +811,7 @@ export default function APKBuilder() {
                                   className="text-green-400 border-green-400 hover:bg-green-400 hover:text-black text-xs"
                                 >
                                   <ExternalLink className="w-3 h-3 mr-1" />
-                                  GitHub
+                                  View Build
                                 </Button>
                                 
                                 <Button
@@ -822,18 +824,21 @@ export default function APKBuilder() {
                                 </Button>
                               </div>
 
-                              {directDownloadUrl && (
-                                <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
-                                  <p className="font-medium mb-1">Download Instructions:</p>
-                                  <ol className="list-decimal list-inside space-y-1">
-                                    <li>Click "Download APK" above</li>
-                                    <li>You'll be redirected to GitHub</li>
-                                    <li>Click the download button on the GitHub page</li>
-                                    <li>Install the APK on your Android phone</li>
-                                    <li>Enable "Install from unknown sources" if needed</li>
-                                  </ol>
-                                </div>
-                              )}
+                              <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
+                                <p className="font-medium mb-1">Download Instructions:</p>
+                                <ol className="list-decimal list-inside space-y-1">
+                                  <li>Click "Download APK" above</li>
+                                  <li>You'll be redirected to GitHub</li>
+                                  <li>Click the download button on the GitHub page</li>
+                                  <li>Install the APK on your Android phone</li>
+                                  <li>Enable "Install from unknown sources" if needed</li>
+                                </ol>
+                                {githubRunId && artifactId && (
+                                  <p className="mt-2 text-green-400">
+                                    Run ID: {githubRunId} • Artifact: {artifactId}
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}
