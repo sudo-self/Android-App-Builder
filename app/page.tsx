@@ -51,14 +51,14 @@ const ICON_CHOICES = [
     url: "https://apk.jessejesse.com/phone-512.png"
   },
   {
-    value: "castle",
+    value: "rocket",
     label: "Castle Icon", 
-    url: "https://apk.jessejesse.com/castle-512.png"
+    url: "https://apk.jessejesse.com/rocket-512.png"
   },
   {
-    value: "smile",
+    value: "shield",
     label: "Smile Icon",
-    url: "https://apk.jessejesse.com/smile-512.png"
+    url: "https://apk.jessejesse.com/shield-512.png"
   }
 ]
 
