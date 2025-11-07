@@ -52,12 +52,12 @@ const ICON_CHOICES = [
   },
   {
     value: "rocket",
-    label: "Castle Icon", 
+    label: "Rocket Icon", 
     url: "https://apk.jessejesse.com/rocket-512.png"
   },
   {
     value: "shield",
-    label: "Smile Icon",
+    label: "Shield Icon",
     url: "https://apk.jessejesse.com/shield-512.png"
   }
 ]
