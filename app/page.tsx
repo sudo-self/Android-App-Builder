@@ -185,7 +185,7 @@ export default function APKBuilder() {
           if (pollCount % 6 === 0) {
             setTerminalLogs(prev => [...prev, `🔄 Building... (${elapsedMinutes}m elapsed)`])
           }
-          setTimeout(pollBuildStatus, 10000) // Increased to 10 seconds
+          setTimeout(pollBuildStatus, 10000)
         }
       } catch (error) {
         console.error('Error polling GitHub status:', error)
@@ -235,7 +235,6 @@ export default function APKBuilder() {
       
       if (runData.status === 'completed') {
         if (runData.conclusion === 'success') {
-          // Wait a bit for artifacts to be available
           await new Promise(resolve => setTimeout(resolve, 5000))
           
           const artifactsResponse = await fetch(
@@ -264,10 +263,9 @@ export default function APKBuilder() {
                 throw new Error('Artifact has expired')
               }
             } else {
-              return { status: 'success' } // Build succeeded but no artifacts
+              return { status: 'success' }
             }
           } else if (artifactsResponse.status === 404) {
-            // No artifacts found, but build succeeded
             return { status: 'success' }
           } else {
             throw new Error(`Failed to fetch artifacts: ${artifactsResponse.status}`)
@@ -300,7 +298,7 @@ export default function APKBuilder() {
     }
 
     try {
-      // First verify the token has the necessary permissions
+      // Verify the repository exists and we have access
       const repoResponse = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`,
         {
@@ -323,6 +321,29 @@ export default function APKBuilder() {
         throw new Error(`GitHub API error: ${repoResponse.status} - ${repoResponse.statusText}`)
       }
 
+      // Reduce payload to 10 properties by combining some fields
+      const optimizedPayload = {
+        buildId: buildData.buildId,
+        hostName: buildData.hostName,
+        name: buildData.name,
+        // Combine theme colors into one field to save space
+        theme: JSON.stringify({
+          color: buildData.themeColor,
+          colorDark: buildData.themeColorDark,
+          background: buildData.backgroundColor
+        }),
+        icon: buildData.iconChoice,
+        iconUrl: buildData.iconUrl,
+        // Combine other fields
+        config: JSON.stringify({
+          launchUrl: buildData.launchUrl,
+          launcherName: buildData.launcherName,
+          publishRelease: buildData.publishRelease
+        })
+      }
+
+      console.log('Sending optimized payload:', optimizedPayload)
+
       const response = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`,
         {
@@ -335,7 +356,7 @@ export default function APKBuilder() {
           },
           body: JSON.stringify({
             event_type: 'apk_build',
-            client_payload: buildData
+            client_payload: optimizedPayload
           })
         }
       )
@@ -351,7 +372,12 @@ export default function APKBuilder() {
         } else if (response.status === 401) {
           throw new Error('GitHub token is invalid or expired. Please check your token.')
         } else if (response.status === 422) {
-          throw new Error('Workflow dispatch failed. Check if the workflow file exists in the repository.')
+          // More specific 422 error handling
+          if (errorText.includes('10 properties')) {
+            throw new Error('Too many properties in payload. Please contact support.')
+          } else {
+            throw new Error('Workflow dispatch failed. Check if the workflow file exists in the repository.')
+          }
         } else {
           throw new Error(`GitHub API error: ${response.status} - ${response.statusText}`)
         }
@@ -360,10 +386,10 @@ export default function APKBuilder() {
       // Wait for the workflow to start
       await new Promise(resolve => setTimeout(resolve, 8000))
 
-      // Poll for the workflow run
-      for (let attempt = 0; attempt < 10; attempt++) {
+      // Poll for the workflow run with more attempts
+      for (let attempt = 0; attempt < 12; attempt++) {
         const runsResponse = await fetch(
-          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=5`,
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=5&sort=created&direction=desc`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -376,18 +402,24 @@ export default function APKBuilder() {
         if (runsResponse.ok) {
           const runsData = await runsResponse.json()
           if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
-            const recentRun = runsData.workflow_runs[0]
-            // Verify this is our run by checking the build ID in the event payload
-            if (recentRun.event === 'repository_dispatch') {
+            // Find the most recent repository_dispatch run
+            const recentRun = runsData.workflow_runs.find((run: any) => 
+              run.event === 'repository_dispatch' && 
+              run.status === 'in_progress'
+            ) || runsData.workflow_runs[0]
+            
+            if (recentRun) {
               return recentRun.id.toString()
             }
           }
+        } else {
+          console.warn(`Failed to fetch runs on attempt ${attempt + 1}:`, runsResponse.status)
         }
 
-        await new Promise(resolve => setTimeout(resolve, 3000))
+        await new Promise(resolve => setTimeout(resolve, 5000))
       }
 
-      throw new Error('Failed to get GitHub Actions run ID. The build may have started - check GitHub Actions manually.')
+      throw new Error('Failed to get GitHub Actions run ID after multiple attempts. Check GitHub Actions manually.')
 
     } catch (error) {
       console.error('Error triggering GitHub action:', error)
@@ -469,6 +501,7 @@ export default function APKBuilder() {
             "🔄 Replacing default icons...",
             "🔄 Creating artifact...",
             "⏳ This may take 2-5 minutes...",
+            `🔗 <a href="https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}" target="_blank" class="text-blue-400 underline">View live progress on GitHub</a>`,
             ""
           ])
         } else {
@@ -518,11 +551,9 @@ export default function APKBuilder() {
           if (response.ok) {
             const blob = await response.blob()
             
-            // Create proper APK filename with extension
             const safeAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
             const filename = `${safeAppName}_${buildId || 'app'}.apk`
             
-            // Create download link
             const blobUrl = URL.createObjectURL(blob)
             const a = document.createElement('a')
             a.href = blobUrl
@@ -541,7 +572,6 @@ export default function APKBuilder() {
           }
         } catch (fetchError) {
           console.error('Direct download failed, falling back to GitHub:', fetchError)
-          // Fallback to GitHub Actions page
           if (githubRunId) {
             window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
           }
@@ -549,7 +579,6 @@ export default function APKBuilder() {
         }
         
       } else if (githubRunId) {
-        // No artifact ID, open GitHub Actions page
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
         setDownloadStatus('idle')
       }
@@ -558,7 +587,6 @@ export default function APKBuilder() {
       setError(`Download failed: ${error.message}`)
       setDownloadStatus('error')
       
-      // Fallback to GitHub Actions page
       if (githubRunId) {
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
       }
@@ -703,8 +731,16 @@ export default function APKBuilder() {
 
                       <div className="space-y-2">
                         {terminalLogs.map((log, index) => (
-                          <div key={index} className="text-green-400 text-sm animate-in fade-in slide-in-from-left-2">
-                            <span className="text-cyan-600 mr-2">$</span> {log}
+                          <div 
+                            key={index} 
+                            className="text-green-400 text-sm animate-in fade-in slide-in-from-left-2"
+                            dangerouslySetInnerHTML={log.includes('<a ') ? { __html: log } : undefined}
+                          >
+                            {!log.includes('<a ') && (
+                              <>
+                                <span className="text-cyan-600 mr-2">$</span> {log}
+                              </>
+                            )}
                           </div>
                         ))}
                         
@@ -722,7 +758,6 @@ export default function APKBuilder() {
 
                         {isComplete && (
                           <div className="mt-4 pt-4 border-t border-slate-700 space-y-3">
-                            {/* Success Message */}
                             <div className="text-center mb-4">
                               <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-2" />
                               <h3 className="text-green-400 font-semibold">APK Ready!</h3>
@@ -731,7 +766,6 @@ export default function APKBuilder() {
                               </p>
                             </div>
 
-                            {/* Download Button with Status */}
                             <div className="space-y-3">
                               <Button
                                 onClick={downloadAPK}
@@ -756,7 +790,6 @@ export default function APKBuilder() {
                                 )}
                               </Button>
 
-                              {/* Alternative Download Options */}
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
                                   onClick={() => window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')}
@@ -777,7 +810,6 @@ export default function APKBuilder() {
                                 </Button>
                               </div>
 
-                              {/* Download Instructions */}
                               <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
                                 <p className="font-medium mb-1">Download Instructions:</p>
                                 <ol className="list-decimal list-inside space-y-1">
@@ -904,7 +936,6 @@ export default function APKBuilder() {
                         </p>
                       </div>
 
-                      {/* Publish Release Option */}
                       <div className="flex items-center space-x-2 p-3 rounded-lg border" style={{
                         borderColor: isDarkMode ? '#334155' : '#e2e8f0',
                         backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc'
