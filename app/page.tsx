@@ -372,7 +372,6 @@ export default function APKBuilder() {
         } else if (response.status === 401) {
           throw new Error('GitHub token is invalid or expired. Please check your token.')
         } else if (response.status === 422) {
-          // More specific 422 error handling
           if (errorText.includes('10 properties')) {
             throw new Error('Too many properties in payload. Please contact support.')
           } else {
@@ -501,7 +500,6 @@ export default function APKBuilder() {
             "🔄 Replacing default icons...",
             "🔄 Creating artifact...",
             "⏳ This may take 2-5 minutes...",
-            `🔗 <a href="https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${runId}" target="_blank" class="text-blue-400 underline">View live progress on GitHub</a>`,
             ""
           ])
         } else {
@@ -731,16 +729,8 @@ export default function APKBuilder() {
 
                       <div className="space-y-2">
                         {terminalLogs.map((log, index) => (
-                          <div 
-                            key={index} 
-                            className="text-green-400 text-sm animate-in fade-in slide-in-from-left-2"
-                            dangerouslySetInnerHTML={log.includes('<a ') ? { __html: log } : undefined}
-                          >
-                            {!log.includes('<a ') && (
-                              <>
-                                <span className="text-cyan-600 mr-2">$</span> {log}
-                              </>
-                            )}
+                          <div key={index} className="text-green-400 text-sm animate-in fade-in slide-in-from-left-2">
+                            <span className="text-cyan-600 mr-2">$</span> {log}
                           </div>
                         ))}
                         
@@ -825,14 +815,12 @@ export default function APKBuilder() {
 
                         {githubRunId && isBuilding && (
                           <div className="text-gray-400 text-xs text-center mt-4 pt-2 border-t border-slate-700">
-                            <a 
-                              href={`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline hover:no-underline hover:text-blue-400"
+                            <button 
+                              onClick={() => window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')}
+                              className="underline hover:no-underline hover:text-blue-400 text-blue-300"
                             >
-                              View live build on GitHub
-                            </a>
+                              View live build on GitHub →
+                            </button>
                           </div>
                         )}
                       </div>
@@ -1161,4 +1149,3 @@ export default function APKBuilder() {
     </div>
   )
 }
-
