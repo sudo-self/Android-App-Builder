@@ -321,28 +321,25 @@ export default function APKBuilder() {
         throw new Error(`GitHub API error: ${repoResponse.status} - ${repoResponse.statusText}`)
       }
 
-      // Reduce payload to 10 properties by combining some fields
-      const optimizedPayload = {
-        buildId: buildData.buildId,
-        hostName: buildData.hostName,
-        name: buildData.name,
-        // Combine theme colors into one field to save space
-        theme: JSON.stringify({
-          color: buildData.themeColor,
-          colorDark: buildData.themeColorDark,
-          background: buildData.backgroundColor
-        }),
-        icon: buildData.iconChoice,
-        iconUrl: buildData.iconUrl,
-        // Combine other fields
-        config: JSON.stringify({
-          launchUrl: buildData.launchUrl,
+      // FIX: Combine ALL properties into a single JSON string to stay within 10-property limit
+      const combinedPayload = {
+        // Single property containing all build data as JSON
+        buildConfig: JSON.stringify({
+          buildId: buildData.buildId,
+          hostName: buildData.hostName,
+          name: buildData.name,
           launcherName: buildData.launcherName,
+          launchUrl: buildData.launchUrl,
+          themeColor: buildData.themeColor,
+          themeColorDark: buildData.themeColorDark,
+          backgroundColor: buildData.backgroundColor,
+          iconChoice: buildData.iconChoice,
+          iconUrl: buildData.iconUrl,
           publishRelease: buildData.publishRelease
         })
       }
 
-      console.log('Sending optimized payload:', optimizedPayload)
+      console.log('Sending combined payload with 1 property:', combinedPayload)
 
       const response = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`,
@@ -356,7 +353,7 @@ export default function APKBuilder() {
           },
           body: JSON.stringify({
             event_type: 'apk_build',
-            client_payload: optimizedPayload
+            client_payload: combinedPayload
           })
         }
       )
@@ -476,15 +473,15 @@ export default function APKBuilder() {
         }
         
         setTerminalLogs([
-          "🚀 Starting APK build...",
-          `📱 App: ${appName}`,
-          `🌐 Domain: ${cleanHostName}`,
-          `🎨 Theme: ${themeColor}`,
-          `🖼️ Icon: ${iconChoice}`,
-          `📦 Publish Release: ${publishRelease ? 'Yes' : 'No'}`,
-          `🆔 Build ID: ${buildId}`,
-          "⬇️ Downloading custom icon...",
-          "⚙️ Configuring app theme...",
+          "Starting APK build",
+          `📱 ${appName}`,
+          `🌐 ${cleanHostName}`,
+          `${themeColor}`,
+          `${iconChoice}`,
+          `📦 Release: ${publishRelease ? 'Yes' : 'No'}`,
+          `Build ID: ${buildId}`,
+          "Downloading custom icon",
+          "Configuring app theme",
           ""
         ])
 
@@ -494,12 +491,12 @@ export default function APKBuilder() {
           setGithubRunId(runId)
           setTerminalLogs(prev => [
             ...prev,
-            `✅ GitHub Action triggered successfully`,
-            `📋 Run ID: ${runId}`,
-            "🔄 Build in progress...",
-            "🔄 Replacing default icons...",
-            "🔄 Creating artifact...",
-            "⏳ This may take 2-5 minutes...",
+            `Action triggered`,
+            `Run ID: ${runId}`,
+            "Build in progress...",
+            "Replacing default icons...",
+            "Creating artifact...",
+            "This may take 2-5 minutes...",
             ""
           ])
         } else {
