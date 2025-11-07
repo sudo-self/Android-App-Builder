@@ -475,13 +475,13 @@ export default function APKBuilder() {
         setTerminalLogs([
           "Starting APK build",
           `📱 ${appName}`,
-          `🌐 ${cleanHostName}`,
+          `${cleanHostName}`,
           `${themeColor}`,
           `${iconChoice}`,
-          `📦 Release: ${publishRelease ? 'Yes' : 'No'}`,
+          `Release: ${publishRelease ? 'Yes' : 'No'}`,
           `Build ID: ${buildId}`,
-          "Downloading custom icon",
-          "Configuring app theme",
+          "Downloading icon",
+          "Configuring app",
           ""
         ])
 
@@ -494,9 +494,9 @@ export default function APKBuilder() {
             `Action triggered`,
             `Run ID: ${runId}`,
             "Build in progress...",
-            "Replacing default icons...",
+            "Replacing icons...",
             "Creating artifact...",
-            "This may take 2-5 minutes...",
+            "build 2-5 minutes",
             ""
           ])
         } else {
@@ -532,7 +532,7 @@ export default function APKBuilder() {
     try {
       setDownloadStatus('downloading')
       
-      // Method 1: Direct GitHub artifact page (most reliable)
+  
       const githubArtifactUrl = getGitHubArtifactUrl()
       if (githubArtifactUrl) {
         window.open(githubArtifactUrl, '_blank')
@@ -541,7 +541,7 @@ export default function APKBuilder() {
         return
       }
       
-      // Method 2: GitHub API download (falls back to ZIP)
+
       if (artifactId) {
         const token = getGitHubToken()
         if (!token) {
@@ -563,7 +563,7 @@ export default function APKBuilder() {
           if (response.ok) {
             const blob = await response.blob()
             
-            // GitHub returns a ZIP file containing the APK
+       
             const safeAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
             const filename = `${safeAppName}_${buildId || 'app'}.zip`
             
@@ -585,7 +585,7 @@ export default function APKBuilder() {
           }
         } catch (fetchError) {
           console.error('Direct download failed, falling back to GitHub page:', fetchError)
-          // Fallback to GitHub Actions page
+         
           if (githubRunId) {
             window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
           }
@@ -593,7 +593,7 @@ export default function APKBuilder() {
         }
         
       } else if (githubRunId) {
-        // Method 3: Just open the GitHub Actions run page
+    
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
         setDownloadStatus('idle')
       } else {
@@ -605,7 +605,7 @@ export default function APKBuilder() {
       setError(`Download failed: ${error.message}`)
       setDownloadStatus('error')
       
-      // Final fallback
+
       if (githubRunId) {
         window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
       }
