@@ -860,25 +860,24 @@ export default function APKBuilder() {
                                 </Button>
                               </div>
 
-                              <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
-                                <p className="font-medium mb-1">Download Instructions</p>
-                                <ol className="list-decimal list-inside space-y-1">
-                                  <li>Click "Download APK"</li>
-                                  <li>Enable "install from unknown sources"</li>
-                                  <li>install the APK</li>
-                                </ol>
-                                {githubRunId && artifactId && (
-                                  <p className="mt-2 text-green-400">
-                                  BUILD: {githubRunId}
-                                  </p>
-                                  <p className="mt-2 text-pink-400">
-                                  APK: {artifactId}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
+  <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
+  <p className="font-medium mb-1">Download Instructions</p>
+  <ol className="list-decimal list-inside space-y-1">
+    <li>Click "Download APK"</li>
+    <li>Enable "install from unknown sources"</li>
+    <li>Install the APK</li>
+  </ol>
+  {githubRunId && artifactId && (
+    <>
+      <p className="mt-2 text-green-400">
+        BUILD: {githubRunId}
+      </p>
+      <p className="mt-2 text-pink-400">
+        APK: {artifactId}
+      </p>
+    </>
+  )}
+</div>
 
                         {githubRunId && isBuilding && (
                           <div className="text-gray-400 text-xs text-center mt-4 pt-2 border-t border-slate-700">
@@ -928,7 +927,7 @@ export default function APKBuilder() {
                          build native Android apps
                         </p>
                          <p className={`text-xs mt-1 ${isDarkMode ? "text-green-400" : "text-pink-600"}`}>
-                          High Quality APKs
+                          GitHub Action APKs
                         </p>
                       </div>
 
