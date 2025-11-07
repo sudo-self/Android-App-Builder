@@ -855,7 +855,7 @@ export default function APKBuilder() {
                      
                       <div className="text-center mb-6">
                         <div 
-                          className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-3 shadow-lg border-2"
+                          className="inline-flex items-center justify-center w-32 h-32 rounded-3xl mb-4 shadow-2xl border-4"
                           style={{
                             backgroundColor: backgroundColor,
                             borderColor: themeColor
@@ -864,28 +864,28 @@ export default function APKBuilder() {
                           <img 
                             src={selectedIcon.url} 
                             alt="App Icon Preview"
-                            className="w-12 h-12 object-contain"
+                            className="w-20 h-20 object-contain"
                             style={{
-                              filter: `drop-shadow(0 2px 4px ${themeColor}40)`
+                              filter: `drop-shadow(0 4px 8px ${themeColor}40)`
                             }}
                           />
                         </div>
                         <h1 
-                          className="text-xl font-bold mb-1 truncate max-w-[200px] mx-auto"
+                          className="text-2xl font-bold mb-2 truncate max-w-[280px] mx-auto"
                           style={{ color: themeColor }}
                         >
                           {appName || "YourApp"}
                         </h1>
                         <p 
-                          className="text-xs opacity-75"
+                          className="text-sm opacity-75"
                           style={{ color: themeColor }}
                         >
                           {hostName || "yourapp.com"}
                         </p>
-                        <p className={`text-xs mt-2 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
+                        <p className={`text-xs mt-3 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                          build native Android apps
                         </p>
-                         <p className={`text-xs mt-2 ${isDarkMode ? "text-green-400" : "text-pink-600"}`}>
+                         <p className={`text-xs mt-1 ${isDarkMode ? "text-green-400" : "text-pink-600"}`}>
                           webkit.WebView
                         </p>
                       </div>
@@ -908,45 +908,6 @@ export default function APKBuilder() {
                           }
                           required
                         />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="appName" className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                          Name
-                        </Label>
-                        <Input
-                          id="appName"
-                          type="text"
-                          placeholder="YourApp Name"
-                          value={appName}
-                          onChange={(e) => setAppName(e.target.value)}
-                          className={isDarkMode
-                            ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-                            : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
-                          }
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="hostName" className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-                         Domain
-                        </Label>
-                        <Input
-                          id="hostName"
-                          type="text"
-                          placeholder="YourApp.com"
-                          value={hostName}
-                          onChange={(e) => setHostName(e.target.value)}
-                          className={isDarkMode
-                            ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-                            : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
-                          }
-                          required
-                        />
-                        <p className={`text-xs text-center ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
-                          apk build time approx 1-3 mins
-                        </p>
                       </div>
 
                       <div className="flex items-center space-x-2 p-3 rounded-lg border" style={{
