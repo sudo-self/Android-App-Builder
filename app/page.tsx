@@ -508,12 +508,11 @@ const combinedPayload = {
           setGithubRunId(runId)
           setTerminalLogs(prev => [
             ...prev,
-            `Action triggered`,
-            `Run ID: ${runId}`,
-            "Build in progress...",
-            "Replacing icons...",
-            "Creating artifact...",
-            "build 2-5 minutes",
+            `action triggered`,
+            `run ID: ${runId}`,
+            "build in progress...",
+            "creating icon...",
+            "time 1-3 minutes",
             ""
           ])
         } else {
