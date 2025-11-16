@@ -339,24 +339,23 @@ export default function APKBuilder() {
       }
 
 
-      const combinedPayload = {
-      
-        buildConfig: JSON.stringify({
-          buildId: buildData.buildId,
-          hostName: buildData.hostName,
-          name: buildData.name,
-          launcherName: buildData.launcherName,
-          launchUrl: buildData.launchUrl,
-          themeColor: buildData.themeColor,
-          themeColorDark: buildData.themeColorDark,
-          backgroundColor: buildData.backgroundColor,
-          iconChoice: buildData.iconChoice,
-          iconUrl: buildData.iconUrl,
-          publishRelease: buildData.publishRelease
-        })
-      }
+  
+const combinedPayload = {
+  buildConfig: {
+    buildId: buildData.buildId,
+    hostName: buildData.hostName,
+    name: buildData.name,
+    launcherName: buildData.launcherName,
+    launchUrl: buildData.launchUrl,
+    themeColor: buildData.themeColor,
+    themeColorDark: buildData.themeColorDark,
+    backgroundColor: buildData.backgroundColor,
+    iconChoice: buildData.iconChoice,
+    iconUrl: buildData.iconUrl,
+    publishRelease: buildData.publishRelease
+  }
+}
 
-      console.log('Sending combined payload with 1 property:', combinedPayload)
 
       const response = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`,
