@@ -577,31 +577,133 @@ export default function APKBuilder() {
   }
 
   const downloadAPK = async () => {
-    try {
-      setDownloadStatus('downloading')
-      
-      // Direct GitHub artifact download
-      if (githubRunId) {
-        const githubUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`;
-        window.open(githubUrl, '_blank');
-        setDownloadStatus('success');
-        setTimeout(() => setDownloadStatus('idle'), 3000);
-        return;
+  try {
+    setDownloadStatus('downloading');
+    
+    const token = getGitHubToken();
+    if (!token) {
+      setError('GitHub token required for download');
+      setDownloadStatus('error');
+      return;
+    }
+
+    if (githubRunId) {
+      // Method 1: Try to get the direct APK download URL from the release
+      if (publishRelease) {
+        try {
+          const releasesResponse = await fetch(
+            `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+              }
+            }
+          );
+
+          if (releasesResponse.ok) {
+            const releases = await releasesResponse.json();
+            const release = releases.find((r: any) => r.tag_name === `release-${buildId}`);
+            
+            if (release && release.assets && release.assets.length > 0) {
+              const apkAsset = release.assets.find((asset: any) => asset.name.endsWith('.apk'));
+              if (apkAsset) {
+                // Download the APK directly from release
+                const apkResponse = await fetch(apkAsset.browser_download_url);
+                if (apkResponse.ok) {
+                  const blob = await apkResponse.blob();
+                  const safeAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                  const filename = `${safeAppName}.apk`;
+                  
+                  const blobUrl = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = blobUrl;
+                  a.download = filename;
+                  a.style.display = 'none';
+                  
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(blobUrl);
+                  
+                  setDownloadStatus('success');
+                  setTimeout(() => setDownloadStatus('idle'), 3000);
+                  return;
+                }
+              }
+            }
+          }
+        } catch (releaseError) {
+          console.log('Release download failed, trying artifacts...');
+        }
       }
 
-      setError('No download available - build may not be complete');
-      setDownloadStatus('error');
-    } catch (error: any) {
-      console.error('Download error:', error);
-      setError(`Download failed: ${error.message}`);
-      setDownloadStatus('error');
-      
-      // Fallback to GitHub actions page
-      if (githubRunId) {
-        window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank');
+      // Method 2: Download artifact ZIP (contains APK inside)
+      const artifactsResponse = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}/artifacts`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        }
+      );
+
+      if (artifactsResponse.ok) {
+        const artifactsData = await artifactsResponse.json();
+        if (artifactsData.artifacts && artifactsData.artifacts.length > 0) {
+          const artifact = artifactsData.artifacts[0];
+          
+          if (!artifact.expired) {
+            const downloadResponse = await fetch(
+              `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/artifacts/${artifact.id}/zip`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Accept': 'application/vnd.github.v3+json'
+                }
+              }
+            );
+
+            if (downloadResponse.ok) {
+              const blob = await downloadResponse.blob();
+              const safeAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+              const filename = `${safeAppName}_${buildId || 'app'}.zip`;
+              
+              const blobUrl = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = blobUrl;
+              a.download = filename;
+              a.style.display = 'none';
+              
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(blobUrl);
+              
+              setDownloadStatus('success');
+              setTimeout(() => setDownloadStatus('idle'), 3000);
+              return;
+            }
+          }
+        }
       }
+
+      // Method 3: Fallback to GitHub page
+      setError('Direct download not available. Opening GitHub page...');
+      window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank');
+      setDownloadStatus('idle');
+      
+    } else {
+      throw new Error('No build run ID available');
     }
-  };
+  } catch (error: any) {
+    console.error('Download error:', error);
+    setError(`Download failed: ${error.message}`);
+    setDownloadStatus('error');
+    setTimeout(() => setDownloadStatus('idle'), 3000);
+  }
+};
 
   const copyAppKey = async () => {
     const keyInfo = `Alias: android\nPassword: 123321\n\nYou will need this key to publish changes to your app.`
