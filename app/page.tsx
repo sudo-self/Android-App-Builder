@@ -1281,8 +1281,7 @@ export default function APKBuilder() {
                     </form>
                   ))}
                 </div>
-
-               {/* GitHub Buttons Section - Fixed */}
+              {/* GitHub Buttons Section - Fixed */}
               <div
                 className={`h-12 flex items-center justify-center gap-2 px-3 border-t ${
                   isDarkMode
@@ -1322,9 +1321,6 @@ export default function APKBuilder() {
         </div>
       </div>
     </div>
-
-    {/* Add GitHub Buttons Script */}
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
   )
 }
 
