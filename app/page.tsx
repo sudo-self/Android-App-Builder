@@ -90,6 +90,7 @@ export default function APKBuilder() {
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'success' | 'error'>('idle')
   const [showPreview, setShowPreview] = useState(false)
   const [previewUrl, setPreviewUrl] = useState("")
+  const [isTesting, setIsTesting] = useState(false)
 
   const selectedIcon = ICON_CHOICES.find(icon => icon.value === iconChoice) || ICON_CHOICES[0]
 
@@ -105,6 +106,28 @@ export default function APKBuilder() {
   }
 
   const hasGitHubToken = !!getGitHubToken()
+
+  // Enhanced terminal logging with timestamps
+  const addTerminalLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setTerminalLogs(prev => [...prev, `[${timestamp}] ${message}`]);
+  };
+
+  // Form validation
+  const validateForm = (): string | null => {
+    if (!url) return "Please enter a website URL";
+    if (!appName.trim()) return "Please enter an app name";
+    if (appName.length > 50) return "App name must be less than 50 characters";
+    if (!hostName) return "Please enter a valid website URL";
+    
+    try {
+      new URL(url);
+    } catch (e) {
+      return "Please enter a valid URL with http:// or https://";
+    }
+    
+    return null;
+  };
 
   useEffect(() => {
     if (url) {
@@ -153,7 +176,7 @@ export default function APKBuilder() {
     const pollBuildStatus = async () => {
       if (isCancelled || pollCount >= maxPolls) {
         if (pollCount >= maxPolls) {
-          setTerminalLogs(prev => [...prev, "⏰ Build timeout - check GitHub Actions for status"])
+          addTerminalLog("⏰ Build timeout - check GitHub Actions for status")
           setIsBuilding(false)
         }
         return
@@ -165,7 +188,8 @@ export default function APKBuilder() {
         const result = await checkBuildStatus(githubRunId)
         
         if (result.status === 'success') {
-          setTerminalLogs(prev => [...prev, "Build completed", "APK is ready"])
+          addTerminalLog("✅ Build completed")
+          addTerminalLog("📱 APK is ready")
           setIsBuilding(false)
           setIsComplete(true)
           
@@ -179,12 +203,12 @@ export default function APKBuilder() {
             setArtifactName(result.artifactName)
           }
         } else if (result.status === 'failed') {
-          setTerminalLogs(prev => [...prev, "Build failed. Check GitHub Actions for details"])
+          addTerminalLog("❌ Build failed. Check GitHub Actions for details")
           setIsBuilding(false)
         } else {
           const elapsedMinutes = Math.floor((Date.now() - buildStartTime) / 60000)
           if (pollCount % 6 === 0) {
-            setTerminalLogs(prev => [...prev, `Building... (${elapsedMinutes}m elapsed)`])
+            addTerminalLog(`⏳ Building... (${elapsedMinutes}m elapsed)`)
           }
           setTimeout(pollBuildStatus, 10000)
         }
@@ -285,26 +309,39 @@ export default function APKBuilder() {
       
   const validateWebsite = async (url: string): Promise<boolean> => {
     try {
-      const urlObj = new URL(url)
-      return !!(urlObj.hostname && urlObj.protocol.startsWith('http') && urlObj.hostname.includes('.'))
+      const urlObj = new URL(url);
+      // More comprehensive validation
+      const isValidProtocol = urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+      const hasValidTld = urlObj.hostname.includes('.') && urlObj.hostname.length > 3;
+      const hasValidPath = !urlObj.pathname.includes(' ') && urlObj.pathname.length <= 1000;
+      
+      return isValidProtocol && hasValidTld && hasValidPath;
     } catch (e) {
       return false
     }
   }
 
-  const testWebsite = () => {
+  const testWebsite = async () => {
     if (!url) {
       setError("Please enter a URL to test")
       return
     }
 
     try {
-      new URL(url)
-      setPreviewUrl(url)
-      setShowPreview(true)
-      setError(null)
+      setIsTesting(true);
+      const isValid = await validateWebsite(url);
+      
+      if (isValid) {
+        setPreviewUrl(url);
+        setShowPreview(true);
+        setError(null);
+      } else {
+        setError("Please enter a valid URL with http:// or https://");
+      }
     } catch (e) {
-      setError("Please enter a valid URL with http:// or https://")
+      setError("Failed to test website");
+    } finally {
+      setIsTesting(false);
     }
   }
 
@@ -315,7 +352,7 @@ export default function APKBuilder() {
     }
 
     try {
- 
+      // Test repository access first
       const repoResponse = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`,
         {
@@ -338,24 +375,21 @@ export default function APKBuilder() {
         throw new Error(`GitHub API error: ${repoResponse.status} - ${repoResponse.statusText}`)
       }
 
-
-  
-const combinedPayload = {
-  buildConfig: {
-    buildId: buildData.buildId,
-    hostName: buildData.hostName,
-    name: buildData.name,
-    launcherName: buildData.launcherName,
-    launchUrl: buildData.launchUrl,
-    themeColor: buildData.themeColor,
-    themeColorDark: buildData.themeColorDark,
-    backgroundColor: buildData.backgroundColor,
-    iconChoice: buildData.iconChoice,
-    iconUrl: buildData.iconUrl,
-    publishRelease: buildData.publishRelease
-  }
-}
-
+      const combinedPayload = {
+        buildConfig: {
+          buildId: buildData.buildId,
+          hostName: buildData.hostName,
+          name: buildData.name,
+          launcherName: buildData.launcherName,
+          launchUrl: buildData.launchUrl,
+          themeColor: buildData.themeColor,
+          themeColorDark: buildData.themeColorDark,
+          backgroundColor: buildData.backgroundColor,
+          iconChoice: buildData.iconChoice,
+          iconUrl: buildData.iconUrl,
+          publishRelease: buildData.publishRelease
+        }
+      }
 
       const response = await fetch(
         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`,
@@ -395,10 +429,8 @@ const combinedPayload = {
         }
       }
 
-  
       await new Promise(resolve => setTimeout(resolve, 8000))
 
-   
       for (let attempt = 0; attempt < 12; attempt++) {
         const runsResponse = await fetch(
           `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=5&sort=created&direction=desc`,
@@ -414,7 +446,6 @@ const combinedPayload = {
         if (runsResponse.ok) {
           const runsData = await runsResponse.json()
           if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
-       
             const recentRun = runsData.workflow_runs.find((run: any) => 
               run.event === 'repository_dispatch' && 
               run.status === 'in_progress'
@@ -441,6 +472,13 @@ const combinedPayload = {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Form validation
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     
     if (!getGitHubToken()) {
       setError('GitHub token not configured. Please check your environment setup.')
@@ -489,32 +527,26 @@ const combinedPayload = {
           publishRelease: publishRelease
         }
         
-        setTerminalLogs([
-          "Starting APK build",
-          `📱 ${appName}`,
-          `${cleanHostName}`,
-          `${themeColor}`,
-          `${iconChoice}`,
-          `Release: ${publishRelease ? 'Yes' : 'No'}`,
-          `ID: ${buildId}`,
-          "Downloading icon",
-          "creating download",
-          ""
-        ])
+        addTerminalLog("🚀 Starting APK build")
+        addTerminalLog(`📱 App: ${appName}`)
+        addTerminalLog(`🌐 URL: ${cleanHostName}`)
+        addTerminalLog(`🎨 Theme: ${themeColor}`)
+        addTerminalLog(`🖼️ Icon: ${iconChoice}`)
+        addTerminalLog(`📦 Release: ${publishRelease ? 'Yes' : 'No'}`)
+        addTerminalLog(`🆔 Build ID: ${buildId}`)
+        addTerminalLog("⬇️ Downloading icon...")
+        addTerminalLog("")
 
         const runId = await triggerGitHubAction(buildData)
         
         if (runId) {
           setGithubRunId(runId)
-          setTerminalLogs(prev => [
-            ...prev,
-            `action triggered`,
-            `run ID: ${runId}`,
-            "build in progress...",
-            "creating icon...",
-            "time 1-3 minutes",
-            ""
-          ])
+          addTerminalLog("✅ GitHub Action triggered")
+          addTerminalLog(`🆔 Run ID: ${runId}`)
+          addTerminalLog("⏳ Build in progress...")
+          addTerminalLog("🎨 Creating app icon...")
+          addTerminalLog("⏰ Estimated time: 1-3 minutes")
+          addTerminalLog("")
         } else {
           throw new Error('Failed to get GitHub Actions run ID. The build may have started - check GitHub Actions.')
         }
@@ -522,7 +554,7 @@ const combinedPayload = {
       } catch (error: any) {
         console.error('Build error:', error)
         const errorMessage = error.message || 'Unknown error occurred'
-        setTerminalLogs(prev => [...prev, `Build failed: ${errorMessage}`])
+        addTerminalLog(`❌ Build failed: ${errorMessage}`)
         setError(errorMessage)
         setIsBuilding(false)
       }
@@ -548,85 +580,28 @@ const combinedPayload = {
     try {
       setDownloadStatus('downloading')
       
-  
-      const githubArtifactUrl = getGitHubArtifactUrl()
-      if (githubArtifactUrl) {
-        window.open(githubArtifactUrl, '_blank')
-        setDownloadStatus('success')
-        setTimeout(() => setDownloadStatus('idle'), 3000)
-        return
-      }
-      
-
-      if (artifactId) {
-        const token = getGitHubToken()
-        if (!token) {
-          setError('GitHub token required for download')
-          setDownloadStatus('error')
-          return
-        }
-
-        const downloadUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/artifacts/${artifactId}/zip`
-        
-        try {
-          const response = await fetch(downloadUrl, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          })
-          
-          if (response.ok) {
-            const blob = await response.blob()
-            
-       
-            const safeAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
-            const filename = `${safeAppName}_${buildId || 'app'}.zip`
-            
-            const blobUrl = URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = blobUrl
-            a.download = filename
-            a.style.display = 'none'
-            
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            URL.revokeObjectURL(blobUrl)
-            
-            setDownloadStatus('success')
-            setTimeout(() => setDownloadStatus('idle'), 3000)
-          } else {
-            throw new Error(`Download failed: ${response.status}`)
-          }
-        } catch (fetchError) {
-          console.error('Direct download failed, falling back to GitHub page:', fetchError)
-         
-          if (githubRunId) {
-            window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
-          }
-          setDownloadStatus('idle')
-        }
-        
-      } else if (githubRunId) {
-    
-        window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
-        setDownloadStatus('idle')
-      } else {
-        setError('No download available - build may not be complete')
-        setDownloadStatus('error')
-      }
-    } catch (error: any) {
-      console.error('Download error:', error)
-      setError(`Download failed: ${error.message}`)
-      setDownloadStatus('error')
-      
-
+      // Direct GitHub artifact download
       if (githubRunId) {
-        window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')
+        const githubUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`;
+        window.open(githubUrl, '_blank');
+        setDownloadStatus('success');
+        setTimeout(() => setDownloadStatus('idle'), 3000);
+        return;
+      }
+
+      setError('No download available - build may not be complete');
+      setDownloadStatus('error');
+    } catch (error: any) {
+      console.error('Download error:', error);
+      setError(`Download failed: ${error.message}`);
+      setDownloadStatus('error');
+      
+      // Fallback to GitHub actions page
+      if (githubRunId) {
+        window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank');
       }
     }
-  }
+  };
 
   const copyAppKey = async () => {
     const keyInfo = `Alias: android\nPassword: 123321\n\nYou will need this key to publish changes to your app.`
@@ -673,7 +648,41 @@ const combinedPayload = {
     setPreviewUrl("")
   }
 
-return (
+  // Configuration helper component
+  const ConfigHelper = () => {
+    const [showConfig, setShowConfig] = useState(false);
+
+    if (hasGitHubToken) return null;
+
+    return (
+      <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-amber-600">
+            <AlertCircle className="w-4 h-4" />
+            <span className="text-sm font-medium">GitHub Token Required</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowConfig(!showConfig)}
+            className="text-amber-600 hover:text-amber-700"
+          >
+            {showConfig ? "Hide" : "Show"} Instructions
+          </Button>
+        </div>
+        
+        {showConfig && (
+          <div className="mt-3 text-xs text-amber-700 space-y-2">
+            <p>1. Create a GitHub Personal Access Token with <code>repo</code> and <code>workflow</code> scopes</p>
+            <p>2. Set environment variable: <code>NEXT_PUBLIC_GITHUB_TOKEN=your_token_here</code></p>
+            <p>3. Restart your application</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div 
@@ -788,13 +797,12 @@ return (
                       <div className="space-y-2">
                         {terminalLogs.map((log, index) => (
                           <div key={index} className="text-green-400 text-sm animate-in fade-in slide-in-from-left-2">
-                            <span className="text-cyan-600 mr-2">$</span> {log}
+                            {log}
                           </div>
                         ))}
                         
                         {isBuilding && (
                           <div className="flex items-center gap-2 text-green-400 text-sm">
-                            <span className="text-green-600">$</span>
                             <div className="flex gap-1">
                               <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse"></div>
                               <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
@@ -894,6 +902,7 @@ return (
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+                      <ConfigHelper />
                      
                       <div className="text-center mb-6">
                         <div 
@@ -952,37 +961,41 @@ return (
                         />
                       </div>
 
+                      <div className="space-y-2">
+                        <Label htmlFor="appName" className={`font-medium flex items-center gap-2 ${
+                          isDarkMode ? "text-white" : "text-slate-900"
+                        }`}>
+                          App Name
+                        </Label>
+                        <Input
+                          id="appName"
+                          type="text"
+                          placeholder="My Awesome App"
+                          value={appName}
+                          onChange={(e) => setAppName(e.target.value)}
+                          className={isDarkMode
+                            ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                            : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
+                          }
+                          required
+                        />
+                      </div>
+
                       <Button
                         type="button"
                         onClick={testWebsite}
-                        disabled={!url}
+                        disabled={!url || isTesting}
                         variant="outline"
                         className="w-full flex items-center justify-center gap-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
                       >
-                        <Play className="w-4 h-4" />
-                        Test URL
+                        {isTesting ? (
+                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Play className="w-4 h-4" />
+                        )}
+                        {isTesting ? "Testing..." : "Test URL"}
                       </Button>
-                      
-                      {/* Add this after the URL input */}
-<div className="space-y-2">
-  <Label htmlFor="appName" className={`font-medium flex items-center gap-2 ${
-    isDarkMode ? "text-white" : "text-slate-900"
-  }`}>
-    App Name
-  </Label>
-  <Input
-    id="appName"
-    type="text"
-    placeholder="My Awesome App"
-    value={appName}
-    onChange={(e) => setAppName(e.target.value)}
-    className={isDarkMode
-      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-      : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
-    }
-    required
-  />
-</div>
+
                       <div className="flex items-center space-x-2 p-3 rounded-lg border" style={{
                         borderColor: isDarkMode ? '#334155' : '#e2e8f0',
                         backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc'
