@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Globe, Moon, Sun, Download, RefreshCw, Github, Copy, Key, Palette, AlertCircle, Image, ExternalLink, CheckCircle2, Upload, Play, X } from "lucide-react"
+import { Globe, Moon, Sun, Download, RefreshCw, Github, Copy, Key, Palette, AlertCircle, Image, ExternalLink, CheckCircle2, Upload, Play, X, Star } from "lucide-react"
 
 const GITHUB_OWNER = 'sudo-self'
 const GITHUB_REPO = 'apk-builder-actions'
@@ -1282,24 +1282,34 @@ export default function APKBuilder() {
                   ))}
                 </div>
 
+                {/* GitHub Buttons Section */}
                 <div
-                  className={`h-8 flex items-center justify-center gap-2 border-t ${
+                  className={`h-12 flex items-center justify-center gap-3 border-t px-4 ${
                     isDarkMode
                       ? "bg-slate-900 border-slate-800"
                       : "bg-slate-100 border-slate-300"
                   } rounded-b-[2.5rem]`}
                 >
+                  {/* Star Button */}
                   <a
-                    href="https://github.com/sudo-self/android-app-builder"
+                    href="https://github.com/sudo-self/apk-builder-actions"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors border border-gray-600"
                   >
-                    <img
-                      src="https://img.shields.io/badge/-android--app--builder-informational?style=plastic&logo=github&logoColor=white"
-                      alt="npm"
-                      className="h-4"
-                    />
+                    <Star className="w-3 h-3 fill-current" />
+                    Star
+                  </a>
+
+                  {/* Use this Action Button */}
+                  <a
+                    href="https://github.com/sudo-self/apk-builder-actions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors border border-blue-500"
+                  >
+                    <Github className="w-3 h-3" />
+                    Use this Action
                   </a>
                 </div>
               </>
