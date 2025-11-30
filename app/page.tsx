@@ -1282,41 +1282,51 @@ export default function APKBuilder() {
                   ))}
                 </div>
 
-                {/* GitHub Buttons Section */}
+               {/* GitHub Buttons Section - Fixed */}
                 <div
-                  className={`h-12 flex items-center justify-center gap-3 border-t px-4 ${
+                  className={`h-10 flex items-center justify-center gap-3 px-4 border-t ${
                     isDarkMode
                       ? "bg-slate-900 border-slate-800"
                       : "bg-slate-100 border-slate-300"
                   } rounded-b-[2.5rem]`}
                 >
-                  {/* Star Button */}
-                  <a
-                    href="https://github.com/sudo-self/apk-builder-actions"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors border border-gray-600"
-                  >
-                    <Star className="w-3 h-3 fill-current" />
-                    Star
-                  </a>
+                  {/* GitHub Star Button */}
+                  <div className="scale-90">
+                    <a 
+                      className="github-button" 
+                      href="https://github.com/sudo-self/apk-builder-actions" 
+                      data-color-scheme="no-preference: light_high_contrast; light: light_high_contrast; dark: light_high_contrast;" 
+                      data-size="large" 
+                      data-show-count="true" 
+                      aria-label="Star sudo-self/apk-builder-actions on GitHub"
+                    >
+                      Star
+                    </a>
+                  </div>
 
-                  {/* Use this Action Button */}
-                  <a
-                    href="https://github.com/sudo-self/apk-builder-actions"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors border border-blue-500"
-                  >
-                    <Github className="w-3 h-3" />
-                    Use this Action
-                  </a>
+                  {/* GitHub Use this Action Button */}
+                  <div className="scale-90">
+                    <a 
+                      className="github-button" 
+                      href="https://github.com/sudo-self/apk-builder-actions" 
+                      data-color-scheme="no-preference: light_high_contrast; light: light_high_contrast; dark: light_high_contrast;" 
+                      data-size="large" 
+                      aria-label="Use this GitHub Action sudo-self/apk-builder-actions on GitHub"
+                    >
+                      Use this Action
+                    </a>
+                  </div>
                 </div>
               </>
             )}
           </div>
         </div>
       </div>
+
+      {/* Add GitHub Buttons Script */}
+      <script async defer src="https://buttons.github.io/buttons.js"></script>
     </div>
   )
 }
+
+
