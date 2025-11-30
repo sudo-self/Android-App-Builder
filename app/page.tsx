@@ -962,7 +962,27 @@ return (
                         <Play className="w-4 h-4" />
                         Test URL
                       </Button>
-
+                      
+                      {/* Add this after the URL input */}
+<div className="space-y-2">
+  <Label htmlFor="appName" className={`font-medium flex items-center gap-2 ${
+    isDarkMode ? "text-white" : "text-slate-900"
+  }`}>
+    App Name
+  </Label>
+  <Input
+    id="appName"
+    type="text"
+    placeholder="My Awesome App"
+    value={appName}
+    onChange={(e) => setAppName(e.target.value)}
+    className={isDarkMode
+      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+      : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
+    }
+    required
+  />
+</div>
                       <div className="flex items-center space-x-2 p-3 rounded-lg border" style={{
                         borderColor: isDarkMode ? '#334155' : '#e2e8f0',
                         backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc'
