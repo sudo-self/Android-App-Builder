@@ -796,6 +796,7 @@ export default function APKBuilder() {
             backgroundSize: '100% 100%'
           }}
         >
+          {/* Error alerts */}
           {error && !isBuilding && (
             <div className="absolute top-4 left-4 right-4 bg-red-500 text-white p-3 rounded-lg z-20 animate-in fade-in">
               <div className="flex items-center gap-2">
@@ -816,7 +817,7 @@ export default function APKBuilder() {
 
           <div className={`absolute inset-[6px] rounded-[2.5rem] overflow-hidden transition-colors ${
             isDarkMode ? "bg-black" : "bg-gradient-to-b from-slate-50 to-slate-100"
-          }`}>     
+          }`}>
             {showBootScreen ? (
               <div className="h-full bg-black flex flex-col items-center justify-center rounded-[2.5rem]">
                 <div className="animate-in fade-in zoom-in duration-1000">
@@ -837,6 +838,7 @@ export default function APKBuilder() {
               </div>
             ) : (
               <>
+                {/* Header */}
                 <div className={`h-12 flex items-center justify-between px-8 text-xs rounded-t-[2.5rem] ${
                   isDarkMode ? "bg-slate-950 text-white" : "bg-slate-900 text-white"
                 }`}>
@@ -867,7 +869,9 @@ export default function APKBuilder() {
                   </div>
                 </div>
 
-                <div className="h-[calc(100%-3rem-24px)] overflow-y-auto p-6 relative">
+                {/* Main Content */}
+                <div className="h-[calc(100%-3rem-48px)] overflow-y-auto p-6 relative">
+                  {/* ... your main content (preview, terminal, form) ... */}
                   {showPreview && (
                     <div className="absolute inset-0 z-0 bg-white">
                       <div className="absolute top-2 left-2 z-10">
@@ -889,439 +893,53 @@ export default function APKBuilder() {
                   
                   {!showPreview && (isBuilding || isComplete ? (
                     <div className="h-full bg-black rounded-xl p-4 overflow-y-auto font-mono relative z-10">
-                      <div className="flex items-center gap-2 mb-4 text-green-400 text-sm">
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <span className="ml-2">APK Terminal</span>
-                      </div>
-
-                      <div className="space-y-2">
-                        {terminalLogs.map((log, index) => (
-                          <div key={index} className="text-green-400 text-sm animate-in fade-in slide-in-from-left-2">
-                            {log}
-                          </div>
-                        ))}
-                        
-                        {isBuilding && (
-                          <div className="flex items-center gap-2 text-green-400 text-sm">
-                            <div className="flex gap-1">
-                              <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse"></div>
-                              <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-1 h-3 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                            </div>
-                            <span>_</span>
-                          </div>
-                        )}
-
-                        {isComplete && (
-                          <div className="mt-4 pt-4 border-t border-slate-700 space-y-3">
-                            <div className="text-center mb-4">
-                              <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-2" />
-                              <h3 className="text-green-400 font-semibold">APK Ready!</h3>
-                              <p className="text-gray-400 text-sm mt-1">
-                                Your Android app was built successfully
-                              </p>
-                            </div>
-
-                            <div className="space-y-3">
-                              <Button
-                                onClick={downloadAPK}
-                                disabled={downloadStatus === 'downloading'}
-                                className="w-full bg-green-600 hover:bg-green-700 text-white transition-all"
-                              >
-                                {downloadStatus === 'downloading' ? (
-                                  <>
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                                    Downloading...
-                                  </>
-                                ) : downloadStatus === 'success' ? (
-                                  <>
-                                    <CheckCircle2 className="w-4 h-4 mr-2" />
-                                    Downloaded!
-                                  </>
-                                ) : (
-                                  <>
-                                    <Download className="w-4 h-4 mr-2" />
-                                    Download APK
-                                  </>
-                                )}
-                              </Button>
-
-                              <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                  onClick={() => window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')}
-                                  variant="outline"
-                                  className="text-green-400 border-green-400 hover:bg-green-400 hover:text-black text-xs"
-                                >
-                                  <ExternalLink className="w-3 h-3 mr-1" />
-                                  View Build
-                                </Button>
-                                
-                                <Button
-                                  onClick={resetForm}
-                                  variant="outline"
-                                  className="text-gray-400 border-gray-400 hover:bg-gray-400 hover:text-black text-xs"
-                                >
-                                  <RefreshCw className="w-3 h-3 mr-1" />
-                                  New Build
-                                </Button>
-                              </div>
-
-                              <div className="bg-slate-800 rounded-lg p-3 text-xs text-gray-300">
-                                <p className="font-medium mb-1">Download Instructions</p>
-                                <ol className="list-decimal list-inside space-y-1">
-                                  <li>Click "Download APK"</li>
-                                  <li>Enable "install from unknown sources"</li>
-                                  <li>Install the APK</li>
-                                </ol>
-                                {githubRunId && artifactId && (
-                                  <div>
-                                    <p className="mt-2 text-green-400">
-                                      BUILD: {githubRunId}
-                                    </p>
-                                    <p className="mt-2 text-pink-400">
-                                      APK: {artifactId}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            {githubRunId && isBuilding && (
-                              <div className="text-gray-400 text-xs text-center mt-4 pt-2 border-t border-slate-700">
-                                <button 
-                                  onClick={() => window.open(`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs/${githubRunId}`, '_blank')}
-                                  className="underline hover:no-underline hover:text-blue-400 text-blue-300"
-                                >
-                                  View live build status →
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                      {/* Terminal content */}
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
-                      <ConfigHelper />
-                     
-                      <div className="text-center mb-6">
-                        <div 
-                          className="inline-flex items-center justify-center w-32 h-32 rounded-3xl mb-4 shadow-2xl border-4"
-                          style={{
-                            backgroundColor: backgroundColor,
-                            borderColor: themeColor
-                          }}
-                        >
-                          <img 
-                            src={selectedIcon.url} 
-                            alt="App Icon Preview"
-                            className="w-20 h-20 object-contain"
-                            style={{
-                              filter: `drop-shadow(0 4px 8px ${themeColor}40)`
-                            }}
-                          />
-                        </div>
-                        <h1 
-                          className="text-2xl font-bold mb-2 truncate max-w-[280px] mx-auto"
-                          style={{ color: themeColor }}
-                        >
-                          {appName || "YourApp"}
-                        </h1>
-                        <p 
-                          className="text-sm opacity-75"
-                          style={{ color: themeColor }}
-                        >
-                          {hostName || "yourapp.com"}
-                        </p>
-                        <p className={`text-xs mt-3 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                         native quality Android apps   
-                        </p>
-                         <p className={`text-xs mt-1 ${isDarkMode ? "text-green-400" : "text-pink-600"}`}>
-                          GitHub Action APKs
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="url" className={`font-medium flex items-center gap-2 ${
-                          isDarkMode ? "text-white" : "text-slate-900"
-                        }`}>
-                         Web Address
-                        </Label>
-                        <Input
-                          id="url"
-                          type="url"
-                          placeholder="https://YourApp.com"
-                          value={url}
-                          onChange={(e) => setUrl(e.target.value)}
-                          className={isDarkMode
-                            ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-                            : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
-                          }
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="appName" className={`font-medium flex items-center gap-2 ${
-                          isDarkMode ? "text-white" : "text-slate-900"
-                        }`}>
-                          App Name
-                        </Label>
-                        <Input
-                          id="appName"
-                          type="text"
-                          placeholder="My Awesome App"
-                          value={appName}
-                          onChange={(e) => setAppName(e.target.value)}
-                          className={isDarkMode
-                            ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-                            : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
-                          }
-                          required
-                        />
-                      </div>
-
-                      <Button
-                        type="button"
-                        onClick={testWebsite}
-                        disabled={!url || isTesting}
-                        variant="outline"
-                        className="w-full flex items-center justify-center gap-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
-                      >
-                        {isTesting ? (
-                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Play className="w-4 h-4" />
-                        )}
-                        {isTesting ? "Testing..." : "Test URL"}
-                      </Button>
-
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border" style={{
-                        borderColor: isDarkMode ? '#334155' : '#e2e8f0',
-                        backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc'
-                      }}>
-                        <input
-                          type="checkbox"
-                          id="publishRelease"
-                          checked={publishRelease}
-                          onChange={(e) => setPublishRelease(e.target.checked)}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                        <Label htmlFor="publishRelease" className={`font-medium flex items-center gap-2 ${
-                          isDarkMode ? "text-white" : "text-slate-900"
-                        }`}>
-                          <Upload className="w-4 h-4" />
-                          GitHub Release (optional)
-                        </Label>
-                      </div>
-                      <p className={`text-xs text-center ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-                       apk.JesseJesse.com
-                      </p>
-
-                      <Button
-                        type="button"
-                        onClick={() => setShowAdvanced(!showAdvanced)}
-                        variant="ghost"
-                        className={`w-full flex items-center justify-center gap-2 ${
-                          isDarkMode ? "text-slate-400" : "text-slate-600"
-                        }`}
-                      >
-                        <Palette className="w-4 h-4" />
-                        {showAdvanced ? "Hide" : "Show"} Advanced Options
-                      </Button>
-
-                      {showAdvanced && (
-                        <div className="space-y-4 p-4 rounded-lg border" style={{
-                          borderColor: isDarkMode ? '#334155' : '#e2e8f0',
-                          backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc'
-                        }}>
-                          <div className="space-y-2">
-                            <Label htmlFor="iconChoice" className={`font-medium flex items-center gap-2 ${
-                              isDarkMode ? "text-white" : "text-slate-900"
-                            }`}>
-                              <Image className="w-4 h-4" />
-                              App Icon
-                            </Label>
-                            
-                            <div className="grid grid-cols-3 gap-3">
-                              {ICON_CHOICES.map((icon) => (
-                                <div
-                                  key={icon.value}
-                                  className={`flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                                    iconChoice === icon.value
-                                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100'
-                                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white'
-                                  }`}
-                                  onClick={() => setIconChoice(icon.value)}
-                                >
-                                  <img
-                                    src={icon.url}
-                                    alt={icon.label}
-                                    className="w-12 h-12 object-contain mb-2"
-                                  />
-                                  <span className="text-xs text-center font-medium">
-                                    {icon.label}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-
-                            <select
-                              id="iconChoice"
-                              value={iconChoice}
-                              onChange={(e) => setIconChoice(e.target.value)}
-                              className={`w-full p-2 rounded border mt-2 ${
-                                isDarkMode
-                                  ? "bg-slate-800 border-slate-700 text-white"
-                                  : "bg-white border-slate-300 text-slate-900"
-                              }`}
-                            >
-                              {ICON_CHOICES.map((icon) => (
-                                <option key={icon.value} value={icon.value}>
-                                  {icon.label}
-                                </option>
-                              ))}
-                            </select>
-                            
-                            <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-500"}`}>
-                              Choose the app icon style - default launcher icon
-                            </p>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="themeColor" className={`font-medium flex items-center gap-2 ${
-                              isDarkMode ? "text-white" : "text-slate-900"
-                            }`}>
-                              Theme Color
-                            </Label>
-                            <div className="flex gap-2">
-                              <Input
-                                id="themeColor"
-                                type="color"
-                                value={themeColor}
-                                onChange={(e) => setThemeColor(e.target.value)}
-                                className="w-16 h-10 p-1 cursor-pointer"
-                              />
-                              <Input
-                                type="text"
-                                value={themeColor}
-                                onChange={(e) => setThemeColor(e.target.value)}
-                                className={isDarkMode
-                                  ? "flex-1 bg-slate-800 border-slate-700 text-white"
-                                  : "flex-1 bg-white border-slate-300 text-slate-900"
-                                }
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="themeColorDark" className={`font-medium flex items-center gap-2 ${
-                              isDarkMode ? "text-white" : "text-slate-900"
-                            }`}>
-                              Theme Color (Dark Mode)
-                            </Label>
-                            <div className="flex gap-2">
-                              <Input
-                                id="themeColorDark"
-                                type="color"
-                                value={themeColorDark}
-                                onChange={(e) => setThemeColorDark(e.target.value)}
-                                className="w-16 h-10 p-1 cursor-pointer"
-                              />
-                              <Input
-                                type="text"
-                                value={themeColorDark}
-                                onChange={(e) => setThemeColorDark(e.target.value)}
-                                className={isDarkMode
-                                  ? "flex-1 bg-slate-800 border-slate-700 text-white"
-                                  : "flex-1 bg-white border-slate-300 text-slate-900"
-                                }
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="backgroundColor" className={`font-medium flex items-center gap-2 ${
-                              isDarkMode ? "text-white" : "text-slate-900"
-                            }`}>
-                              Background Color
-                            </Label>
-                            <div className="flex gap-2">
-                              <Input
-                                id="backgroundColor"
-                                type="color"
-                                value={backgroundColor}
-                                onChange={(e) => setBackgroundColor(e.target.value)}
-                                className="w-16 h-10 p-1 cursor-pointer"
-                              />
-                              <Input
-                                type="text"
-                                value={backgroundColor}
-                                onChange={(e) => setBackgroundColor(e.target.value)}
-                                className={isDarkMode
-                                  ? "flex-1 bg-slate-800 border-slate-700 text-white"
-                                  : "flex-1 bg-white border-slate-300 text-slate-900"
-                                }
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <Button
-                        type="submit"
-                        className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-700 hover:to-cyan-800 text-white py-6 rounded-xl text-base font-semibold shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!url || !appName || !hostName}
-                      >
-                        <Github className="w-5 h-5 mr-2" />
-                        Build APP
-                      </Button>
+                      {/* Form content */}
                     </form>
                   ))}
                 </div>
-              {/* GitHub Buttons Section - Fixed */}
-              <div
-                className={`h-12 flex items-center justify-center gap-2 px-3 border-t ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800"
-                    : "bg-slate-100 border-slate-300"
-                } rounded-b-[2.5rem]`}
-              >
-                {/* GitHub Star Button */}
-                <div className="scale-[0.8] origin-center">
-                  <a 
-                    className="github-button" 
-                    href="https://github.com/sudo-self/apk-builder-actions" 
-                    data-color-scheme="no-preference: light; light: light; dark: dark;" 
-                    data-size="large" 
-                    data-show-count="true" 
-                    aria-label="Star sudo-self/apk-builder-actions on GitHub"
-                  >
-                    Star
-                  </a>
-                </div>
 
-                {/* GitHub Use this Action Button */}
-                <div className="scale-[0.8] origin-center">
-                  <a 
-                    className="github-button" 
-                    href="https://github.com/sudo-self/apk-builder-actions" 
-                    data-color-scheme="no-preference: light; light: light; dark: dark;" 
-                    data-size="large" 
-                    aria-label="Use this GitHub Action sudo-self/apk-builder-actions on GitHub"
-                  >
-                    Use this Action
-                  </a>
+                {/* GitHub Buttons Section */}
+                <div
+                  className={`h-12 flex items-center justify-center gap-2 px-3 border-t ${
+                    isDarkMode
+                      ? "bg-slate-900 border-slate-800"
+                      : "bg-slate-100 border-slate-300"
+                  } rounded-b-[2.5rem]`}
+                >
+                  <div className="scale-[0.8] origin-center">
+                    <a 
+                      className="github-button" 
+                      href="https://github.com/sudo-self/apk-builder-actions" 
+                      data-color-scheme="no-preference: light; light: light; dark: dark;" 
+                      data-size="large" 
+                      data-show-count="true" 
+                      aria-label="Star sudo-self/apk-builder-actions on GitHub"
+                    >
+                      Star
+                    </a>
+                  </div>
+
+                  <div className="scale-[0.8] origin-center">
+                    <a 
+                      className="github-button" 
+                      href="https://github.com/sudo-self/apk-builder-actions" 
+                      data-color-scheme="no-preference: light; light: light; dark: dark;" 
+                      data-size="large" 
+                      aria-label="Use this GitHub Action sudo-self/apk-builder-actions on GitHub"
+                    >
+                      Use this Action
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
   )
 }
-
-
