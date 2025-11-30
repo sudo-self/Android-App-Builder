@@ -530,11 +530,11 @@ export default function APKBuilder() {
         addTerminalLog("🚀 Starting APK build")
         addTerminalLog(`📱 App: ${appName}`)
         addTerminalLog(`🌐 URL: ${cleanHostName}`)
-        addTerminalLog(`🎨 Theme: ${themeColor}`)
-        addTerminalLog(`🖼️ Icon: ${iconChoice}`)
-        addTerminalLog(`📦 Release: ${publishRelease ? 'Yes' : 'No'}`)
+        addTerminalLog(`Theme: ${themeColor}`)
+        addTerminalLog(`Icon: ${iconChoice}`)
+        addTerminalLog(`Release: ${publishRelease ? 'Yes' : 'No'}`)
         addTerminalLog(`🆔 Build ID: ${buildId}`)
-        addTerminalLog("⬇️ Downloading icon...")
+        addTerminalLog("⬇️ Downloading")
         addTerminalLog("")
 
         const runId = await triggerGitHubAction(buildData)
@@ -543,9 +543,9 @@ export default function APKBuilder() {
           setGithubRunId(runId)
           addTerminalLog("✅ GitHub Action triggered")
           addTerminalLog(`🆔 Run ID: ${runId}`)
-          addTerminalLog("⏳ Build in progress...")
-          addTerminalLog("🎨 Creating app icon...")
-          addTerminalLog("⏰ Estimated time: 1-3 minutes")
+          addTerminalLog("Build in progress...")
+          addTerminalLog("Creating icon...")
+          addTerminalLog("Est: 1-3 mins")
           addTerminalLog("")
         } else {
           throw new Error('Failed to get GitHub Actions run ID. The build may have started - check GitHub Actions.')
@@ -934,7 +934,7 @@ export default function APKBuilder() {
                           {hostName || "yourapp.com"}
                         </p>
                         <p className={`text-xs mt-3 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
-                         build native Android apps
+                         native Android build Kotlin 
                         </p>
                          <p className={`text-xs mt-1 ${isDarkMode ? "text-green-400" : "text-pink-600"}`}>
                           GitHub Action APKs
